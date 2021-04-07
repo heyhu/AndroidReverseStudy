@@ -16,8 +16,7 @@
     > 1) attach模式：frida -U android.process.acore -l s1.js
     > 2) spawn模式：frida -U --no-pause -f com.xes.jazhanghui.activity -l hash.js
 
-* Options  
-
+* Options：  
     命令行模式
     > 1)  -f 为spwan模式，以全新的进程启动一个app。如果不加f，就是先让程序一段时间运行在attach上去。
     > 2)  -l 指定hook脚本
