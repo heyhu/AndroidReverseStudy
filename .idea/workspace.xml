@@ -19,7 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a4383cff-8198-436f-a32a-abe9b7f93ea7" name="Default Changelist" comment="" />
+    <list default="true" id="a4383cff-8198-436f-a32a-abe9b7f93ea7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/FRIDA/A02/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FRIDA/A01/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/FRIDA/A01/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,13 +46,14 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/TOOLS" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/FRIDA/A02" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/FRIDA/A01/pic" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/FRIDA/A02" />
       <recent name="$PROJECT_DIR$/TOOLS" />
     </key>
   </component>
@@ -61,7 +67,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1617777913702</updated>
-      <workItem from="1617777915443" duration="3327000" />
+      <workItem from="1617777915443" duration="4391000" />
     </task>
     <servers />
   </component>
