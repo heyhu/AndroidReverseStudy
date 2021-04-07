@@ -61,9 +61,6 @@
 25. Wallbreaker
     > 搜索实例的时候不一定用类名，可以使用objection 搜索出的实例地址。
 
-26. objection 加载插件
-    1. objection -g com.app.name explore -P ~/.objection/plugins
-    2. plugin load /Users/zhaoshouxin/code/Wallbreaker
 
 ### Tool
 
