@@ -28,6 +28,21 @@
    ```  
    
 4. [查找实例进行主动调用](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
+   ```
+   java 方法分静态和动态 带static的方法可以直接调用，否则需要实例, 注意时机！一般不能用spwan。
+   Java.choose的使用, 原型：Java.choose(className, callbacks)
+   作用：在内存中扫描Java的堆(heap) 找到指定类(className)的实例化对象
+   例子：
+         var a;
+         Java.choose('com.Tester.Mtop.a', {
+         "onMatch":function(instance){
+             a = instance
+         },
+         "onComplete":function(){}
+           }
+         )
+   注意：类名为string -> 'com.Tester.Mtop.a'
+   ```
 
 5. [内部变量赋值修改](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
     ```
