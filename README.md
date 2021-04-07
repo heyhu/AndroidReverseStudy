@@ -3,7 +3,7 @@
 
 ---
 
-# 《FRIDA系列文章》
+# 《FRIDA系列》
 - [01.FRIDA配置](FRIDA/A01/README.md)
 - [02.Objection配置](FRIDA/A02/README.md)
 
