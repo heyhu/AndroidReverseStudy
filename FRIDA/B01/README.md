@@ -71,7 +71,7 @@
    ```     
    ![](pic/01.c.png)   
   
-8. [枚举所有classLoader](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
+8. [枚举所有classLoader, 找到要hook的类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
    ```
     1. 只有找到类对应的loader，才能找到这个类以及hook对应的方法。
     2. 类是怎么加载到java虚拟机并执行？
