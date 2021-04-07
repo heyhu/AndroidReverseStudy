@@ -19,10 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a4383cff-8198-436f-a32a-abe9b7f93ea7" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FRIDA/B01/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/FRIDA/B01/README.md" afterDir="false" />
-    </list>
+    <list default="true" id="a4383cff-8198-436f-a32a-abe9b7f93ea7" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -46,6 +43,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/FRIDA/B01" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -69,7 +67,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1617777913702</updated>
-      <workItem from="1617777915443" duration="9628000" />
+      <workItem from="1617777915443" duration="9890000" />
     </task>
     <servers />
   </component>
@@ -92,5 +90,9 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="354" y="132" key="#Inspections/0.0.1440.900/-2560.-326.2560.1440@0.0.1440.900" timestamp="1617779364895" />
+    <state x="229" y="86" key="SettingsEditor" timestamp="1617788038388">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="229" y="86" key="SettingsEditor/0.0.1440.900/-2560.-301.2560.1365@0.0.1440.900" timestamp="1617788038388" />
   </component>
 </project>
