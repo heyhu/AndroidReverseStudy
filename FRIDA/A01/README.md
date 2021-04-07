@@ -1,4 +1,4 @@
-### FRIDA:
+### Frida:
 
 1. 为Frida改成非标准端口：./frida-server-12.10.2-android-arm -l 0.0.0.0:8888
 
