@@ -14,7 +14,9 @@
 
 7. 脚本注入：  
    1. attach模式：frida -U android.process.acore -l s1.js
+        > 直接附加到已知已存在的进程
    2. spawn模式：frida -U --no-pause -f com.xes.jazhanghui.activity -l hash.js
+        > 找到指定包名的app并在启动前注入脚本进去，加“--no-pause”表示直接启动, 不暂停在app启动时
 
 8. Options：
 
