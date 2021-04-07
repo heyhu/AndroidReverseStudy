@@ -41,9 +41,9 @@
    如果方法属性同在，直接调用的是方法，想调用属性的话，前面加下划线：instance_a._value_c.value = true;
    ```  
 
-6. [查找内部类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
-   ![](pic/01.b.png) 
-   innerClass是activity4的内部类。 
+6. [查找内部类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)  
+   ![](pic/01.b.png)   
+   innerClass是activity4的内部类。   
    ```
     内部的a方法怎么用frida hook到 ?
     1. 用jadx看smali，内部类是有个分配给他的类似$a的名字的；
