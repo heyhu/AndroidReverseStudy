@@ -1,4 +1,4 @@
-### FRIDA
+### FRIDA:
 
 1. 为Frida改成非标准端口：./frida-server-12.10.2-android-arm -l 0.0.0.0:8888
 
@@ -13,10 +13,10 @@
 6. 指定多个pid：使用-p参数，指定pid
 
 7. 脚本注入：  
-   1.attach模式：frida -U android.process.acore -l s1.js  
-   2.spawn模式：frida -U --no-pause -f com.xes.jazhanghui.activity -l hash.js
+   1. attach模式：frida -U android.process.acore -l s1.js
+   2. spawn模式：frida -U --no-pause -f com.xes.jazhanghui.activity -l hash.js
 
-### Options：
+8. Options：
 
     1. 命令行模式:
         1. -f 为spwan模式，以全新的进程启动一个app。如果不加f，就是先让程序一段时间运行在attach上去。  
