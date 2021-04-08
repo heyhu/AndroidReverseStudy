@@ -2,8 +2,8 @@
 
 1. [输出bytes数组, bytesToString](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/pass_invoke.js)  
    ![](pic/01.a.png)
-   ```
-    ByteString.of是用来把byte[]数组转成hex字符串的函数, Android系统自带ByteString类
+   ```js
+    // ByteString.of是用来把byte[]数组转成hex字符串的函数, Android系统自带ByteString类
     var ByteString = Java.use("com.android.okhttp.okio.ByteString");
     var j = Java.use("c.business.comm.j");
     j.x.implementation = function() {
@@ -204,8 +204,8 @@
 22. [rpc 上传到PC上打印，内外互联](https://www.freebuf.com/articles/system/190565.html)
 
 23. [Java.use得到的类使用java的内置方法]   
-    ```
-    使用类的一些反射方法
+    ```js
+    // 使用类的一些反射方法
     var InnerClass = Java.use(class_name);
     var all_methods = InnerClass.class.getDeclaredMethods();
     ```
@@ -216,7 +216,7 @@
     ```
     
 25. hook方法的所有重载
-    ```
+    ```js
     //目标类
     var hook = Java.use(targetClass);
     //重载次数
@@ -251,7 +251,7 @@
     ```     
     
 26. hook类的所有方法
-    ```
+    ```js
      function traceClass(targetClass)
         {
           //Java.use是新建一个对象哈，大家还记得么？
@@ -275,7 +275,7 @@
     ```     
 
 26. hook类的所有子类
-    ```
+    ```js
      //枚举所有已经加载的类
     Java.enumerateLoadedClasses({
         onMatch: function(aClass) {
