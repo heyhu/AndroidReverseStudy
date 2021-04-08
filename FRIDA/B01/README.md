@@ -35,7 +35,7 @@
    例子：
          var a;
          Java.choose('com.Tester.Mtop.a', {
-         "onMatch":function(instance){
+         "onMatch":function(instance){   //该类有多少个实例，该回调就会被触发多少次
              a = instance
          },
          "onComplete":function(){}
@@ -147,7 +147,7 @@
     });
     2. 格式整齐
     console.log(Java.use("android.util.Log").getStackTraceString(Java.use("java.lang.Throwable").$new()));
-    ```     
+    ```
 
 15. [gson 解决打印问题，打印char数组、bytes数组等](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)
     ```
@@ -166,13 +166,13 @@
     var newCharArray = Java.array('char', ['一', '去', '二', '三', '里']);
     var newR = Java.use('java.lang.String').$new(newCharArray);
     return newR
-    ```  
+    ```
     
 17. [Java.cast 类型强转](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)
     ```
      WaterHandler为实例
      子类转父类可以实现, 父类 强转子类会报错不可能实现
-    ```  
+    ```
     
 18. [Java.registerClass](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)   
      ```
@@ -183,7 +183,7 @@
             Log.d("3interface", "flowing : interface ");
             return "nihao";
      };
-     ```    
+     ```
     
 19. [Java hook enum](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)   
     ```
