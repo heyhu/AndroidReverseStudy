@@ -195,7 +195,7 @@
         public static Signal color = Signal.RED;
     ```
 
-20. [hook Hashmap](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0526.js)
+20. [hook Hashmap](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0526.js)     
     `类似list、set等 hook到实例都可以调用原先java类的方法`
 
 21. [non-ascii类名方法名hook](https://api-caller.com/2019/03/30/frida-note/)
