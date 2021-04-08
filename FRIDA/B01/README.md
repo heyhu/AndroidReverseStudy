@@ -32,6 +32,7 @@
    java 方法分静态和动态 带static的方法可以直接调用，否则需要实例, 注意时机！一般不能用spwan。
    Java.choose的使用, 原型：Java.choose(className, callbacks)
    作用：在内存中扫描Java的堆(heap) 找到指定类(className)的实例化对象
+   Java.use()与Java.choose()最大的区别，就是在于前者会新建一个对象，后者会选择内存中已有的实例。
    例子：
          var a;
          Java.choose('com.Tester.Mtop.a', {
@@ -212,4 +213,80 @@
 24. java string 对象打印
     ```
     很多对象都可以用 .toString() 来打印字符串
+    ```
+    
+25. hook方法的所有重载
+    ```
+    //目标类
+    var hook = Java.use(targetClass);
+    //重载次数
+    var overloadCount = hook[targetMethod].overloads.length;
+    //打印日志：追踪的方法有多少个重载
+    console.log("Tracing " + targetClassMethod + " [" + overloadCount + " overload(s)]");
+    //每个重载都进入一次
+    for (var i = 0; i < overloadCount; i++) {
+    //hook每一个重载
+        hook[targetMethod].overloads[i].implementation = function() {
+            console.warn("\n*** entered " + targetClassMethod);
+    
+            //可以打印每个重载的调用栈，对调试有巨大的帮助，当然，信息也很多，尽量不要打印，除非分析陷入僵局
+            Java.perform(function() {
+                 var bt = Java.use("android.util.Log").getStackTraceString(Java.use("java.lang.Exception").$new());
+                    console.log("\nBacktrace:\n" + bt);
+            });   
+    
+            // 打印参数
+            if (arguments.length) console.log();
+            for (var j = 0; j < arguments.length; j++) {
+                console.log("arg[" + j + "]: " + arguments[j]);
+            }
+    
+            //打印返回值
+            var retval = this[targetMethod].apply(this, arguments); // rare crash (Frida bug?)
+            console.log("\nretval: " + retval);
+            console.warn("\n*** exiting " + targetClassMethod);
+            return retval;
+        }
+    }
+    ```     
+    
+26. hook类的所有方法
+    ```
+     function traceClass(targetClass)
+        {
+          //Java.use是新建一个对象哈，大家还记得么？
+            var hook = Java.use(targetClass);
+          //利用反射的方式，拿到当前类的所有方法
+            var methods = hook.class.getDeclaredMethods();
+          //建完对象之后记得将对象释放掉哈
+            hook.$dispose;
+          //将方法名保存到数组中
+            var parsedMethods = [];
+            methods.forEach(function(method) {
+                parsedMethods.push(method.toString().replace(targetClass + ".", "TOKEN").match(/\sTOKEN(.*)\(/)[1]);
+            });
+          //去掉一些重复的值
+            var targets = uniqBy(parsedMethods, JSON.stringify);
+          //对数组中所有的方法进行hook，traceMethod也就是第一小节的内容
+            targets.forEach(function(targetMethod) {
+                traceMethod(targetClass + "." + targetMethod);
+            });
+        }
+    ```     
+
+26. hook类的所有子类
+    ```
+     //枚举所有已经加载的类
+    Java.enumerateLoadedClasses({
+        onMatch: function(aClass) {
+            //迭代和判断
+            if (aClass.match(pattern)) {
+                //做一些更多的判断，适配更多的pattern
+                var className = aClass.match(/[L]?(.*);?/)[1].replace(/\//g, ".");
+                //进入到traceClass里去
+                traceClass(className);
+            }
+        },
+        onComplete: function() {}
+    });
     ```
