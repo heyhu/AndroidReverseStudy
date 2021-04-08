@@ -9,7 +9,7 @@
 - [01.FRIDA配置](FRIDA/A01/README.md)
 - [02.Objection配置](FRIDA/A02/README.md)
 
-## B.FRIDA脚本篇
+## B.FRIDA API篇
 
 - [01.Hook Java](FRIDA/B01/README.md)
 
