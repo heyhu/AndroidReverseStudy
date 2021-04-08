@@ -6,8 +6,8 @@
 # 《FRIDA系列》
 ## A.配置与使用  
 
-- [01.FRIDA配置](FRIDA/A01/README.md)
-- [02.Objection配置与使用](FRIDA/A02/README.md)
+- [01.FRIDA](FRIDA/A01/README.md)
+- [02.Objection](FRIDA/A02/README.md)
 
 ## B.FRIDA API篇
 
