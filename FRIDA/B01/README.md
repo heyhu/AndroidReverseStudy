@@ -1,6 +1,6 @@
 ### Hook java
 
-1. [输出bytes数组, bytesToString](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0516.js)  
+1. [输出bytes数组, bytesToString](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/pass_invoke.js)  
    ![](pic/01.a.png)
    ```
     ByteString.of是用来把byte[]数组转成hex字符串的函数, Android系统自带ByteString类
@@ -18,7 +18,7 @@
     };
    ```
 
-2. [密码爆破，在内存里主动调用](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0516.js)     
+2. [密码爆破，在内存里主动调用](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/pass_invoke.js)     
 
 3. 构造一个aaaa字符串
    ```
@@ -27,7 +27,7 @@
    注：如果字符串为$new生成出来的，则可以调用java层string类的方法。
    ```
    
-4. [查找实例进行主动调用](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
+4. [查找实例进行主动调用](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js)
    ```
    java 方法分静态和动态 带static的方法可以直接调用，否则需要实例, 注意时机！一般不能用spwan。
    Java.choose的使用, 原型：Java.choose(className, callbacks)
@@ -44,7 +44,7 @@
    注意：类名为string -> 'com.Tester.Mtop.a'
    ```
 
-5. [内部变量赋值修改](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
+5. [内部变量赋值修改](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js)
     ```
    var a = Java.use("com.android.okhttp.okio.ByteString");
    static value_a = false //属性
@@ -56,7 +56,7 @@
    如果方法属性同在，直接调用的是方法，想调用属性的话，前面加下划线：instance_a._value_c.value = true;
    ```
 
-6. [查找内部类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)  
+6. [查找内部类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js)  
    ```
     内部的a方法怎么用frida hook到 ?
     1. 用jadx看smali，内部类是有个分配给他的类似$a的名字的；
@@ -65,13 +65,13 @@
    ![](pic/01.b.png)   
    innerClass是activity4的内部类。   
 
-7. [getDeclaredMethods](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
+7. [getDeclaredMethods](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js)
    ```
    获取本类中的所有方法，包括私有的(private、protected、默认以及public)的方法。
    ```
    ![](pic/01.c.png)   
   
-8. [枚举所有classLoader, 找到要hook的类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
+8. [枚举所有classLoader, 找到要hook的类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js)
    ```
     1. 只有找到类对应的loader，才能找到这个类以及hook对应的方法。
     2. 类是怎么加载到java虚拟机并执行？
@@ -84,7 +84,7 @@
        resolveClass()：实现让JVM链接这个类，此方法调用的是本地方法，不能重载。
    ```
 
-9. [enumerateLoadedClasses](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0519.js)
+9. [enumerateLoadedClasses](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js)
    ```
     枚举所有已加载的类，enumerateLoadedClasses, 过滤出自己想要的类名。
     笨方法：
@@ -149,7 +149,7 @@
     console.log(Java.use("android.util.Log").getStackTraceString(Java.use("java.lang.Throwable").$new()));
     ```     
 
-15. [gson 解决打印问题，打印char数组、bytes数组等](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0526.js)
+15. [gson 解决打印问题，打印char数组、bytes数组等](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)
     ```
     在使用gson.dex打印[object]的时候，有时候apk里内置了一个gson，再load就会有重名的问题。
     我自己编译了一个gson，改了包名，效果如图，这样就不会再重名了。
@@ -159,7 +159,7 @@
     console.log(gson.$new().toJson(xxx));
     ```
     
-16. [Java.array 构造数组，构造对象](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0526.js)
+16. [Java.array 构造数组，构造对象](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)
     ```
     JNI的方法签名首先列出java数据类型与签名类型的对应关系：
     https://www.cnblogs.com/bokezhilu/p/7679527.html
@@ -168,13 +168,13 @@
     return newR
     ```  
     
-17. [Java.cast 类型强转](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0526.js)
+17. [Java.cast 类型强转](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)
     ```
      WaterHandler为实例
      子类转父类可以实现, 父类 强转子类会报错不可能实现
     ```  
     
-18. [Java.registerClass](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0526.js)   
+18. [Java.registerClass](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)   
      ```
      动态创建一个类，实现并重写别人的接口, 可以实现过ssl pingning检测以及runnable多线程
      java源码
@@ -185,7 +185,7 @@
      };
      ```    
     
-19. [Java hook enum](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0526.js)   
+19. [Java hook enum](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)   
     ```
     java源码
     enum Signal {
@@ -195,7 +195,7 @@
         public static Signal color = Signal.RED;
     ```
 
-20. [hook Hashmap](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/demo1_0526.js)     
+20. [hook Hashmap](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js)     
     `类似list、set等 hook到实例都可以调用原先java类的方法`
 
 21. [non-ascii类名方法名hook](https://api-caller.com/2019/03/30/frida-note/)
