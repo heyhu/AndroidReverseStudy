@@ -97,3 +97,11 @@
     }
    ```  
    ![](pic/01.d.png)  
+
+10. hook interface
+    ```
+    public class milk implements liquid {
+    implements //就是接口的意思。关键字，implements是一个类，实现一个接口用的关键字，它是用来实现接口中定义的抽象方法。实现一个接口，必须实现接口中的所有方法。
+    ```     
+    ![](pic/01.e.png)  
+    
