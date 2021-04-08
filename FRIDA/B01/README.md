@@ -274,7 +274,7 @@
         }
     ```     
 
-26. hook类的所有子类
+27. hook类的所有子类
     ```js
      //枚举所有已经加载的类
     Java.enumerateLoadedClasses({
