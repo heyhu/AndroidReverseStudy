@@ -49,12 +49,12 @@
    
     frida也为Int64(v)提供了一些相关的API： 
 
-    索引	API	含义  
-    1	add(rhs)、sub(rhs)、and(rhs)、or(rhs)、xor(rhs)	加、减、逻辑运算    
-    2	shr(N)、shl(n)	向右/向左移位n位生成新的Int64  
-    3	Compare(Rhs)	返回整数比较结果    
-    4	toNumber()	转换为数字   
-    5	toString([radix=10])	转换为可选基数的字符串(默认为10)  
+    索引API	                                             含义  
+    1	 add(rhs)、sub(rhs)、and(rhs)、or(rhs)、xor(rhs)	 加、减、逻辑运算    
+    2	 shr(N)、shl(n)	                                 向右/向左移位n位生成新的Int64  
+    3	 Compare(Rhs)	                                 返回整数比较结果    
+    4	 toNumber()	                                     转换为数字   
+    5	 toString([radix=10])	                         转换为可选基数的字符串(默认为10)  
     代码如下：   
     ```js
       function hello_type() {
