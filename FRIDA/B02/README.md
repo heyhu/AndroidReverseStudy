@@ -30,7 +30,6 @@ hexdump，其含义:打印内存中的地址，target参数可以是ArrayBuffer�
  ![](pic/01.a.png)
 
 
-
 ### 1.2 声明变量类型   
 
 | **索引** |       **API**        |                           **含义**                           |
@@ -227,11 +226,12 @@ function frida_Module() {
 }
 setImmediate(frida_Module,0);
 
+/*
 输出如下：
 模块名称: libnative-lib.so
 模块地址: 0x78472c1000
 大小: 245760
-文件系统路径 /data/app/com.example.demoso1-v1xfTV75c5A89ZIUfqmeQg==/lib/arm64/libnative-lib.so
+文件系统路径 /data/app/com.example.demoso1-v1xfTV75c5A89ZIUfqmeQg==/lib/arm64/libnative-lib.so */
 ```
 
 #### 1.4.4 Process.EnumererateModules()
@@ -256,11 +256,12 @@ function frida_Module() {
 }
 setImmediate(frida_Module,0);
 
+/*
 输出如下：
 模块名称: libhello.so
 模块地址: 0xdf2d3000
 大小: 24576
-文件系统路径 /data/app/com.roysue.roysueapplication-7adQZoYIyp5t3G5Ef5wevQ==/lib/arm/libhello.so
+文件系统路径 /data/app/com.roysue.roysueapplication-7adQZoYIyp5t3G5Ef5wevQ==/lib/arm/libhello.so */
 ```
 
 这边如果去除判断的话会打印所有加载的`so`的信息，这里我们就知道了哪些方法返回了`Module`对象了，然后我们再继续深入学习`Module`对象自带的`API`。
@@ -288,6 +289,7 @@ function frida_Module() {
 }
 setImmediate(frida_Module,0);
 
+/*
 输出如下：
 [Google Pixel::com.roysue.roysueapplication]-> type: function
 name: __cxa_atexit
@@ -300,8 +302,8 @@ address: 0xf58f462d
 type: function
 name: __stack_chk_fail
 module: /system/lib/libc.so
-address: 0xf58e2681
-...
+address: 0xf58e2681 
+... */
 ```
 
 #### 1.4.6 enumerateExports()
@@ -325,6 +327,7 @@ function frida_Module() {
 }
 setImmediate(frida_Module,0);
 
+/*
 输出如下：
 [Google Pixel::com.example.demoso1]-> type: function
 name: Java_com_example_demoso1_MainActivity_myfirstjniJNI
@@ -334,7 +337,7 @@ type: variable
 name: _ZTIDu
 module: undefined
 address: 0x78472fb568
-...
+... */
 ```
 
 #### 1.4.7 enumerateSymbols()
@@ -357,6 +360,7 @@ function frida_Module() {
 }
 setImmediate(frida_Module,0);
 
+/*
 输出如下：
 isGlobal: true
 type: function
@@ -368,7 +372,7 @@ type: function
 section: {"id":"13.text","protection":"r-x"}
 name: _Unwind_GetTextRelBase
 address: 0xf591c7cc
-...
+... */
 ```
 
 #### 1.4.8 Module.findExportByName(exportName), Module.getExportByName(exportName)
@@ -387,9 +391,10 @@ function frida_Module() {
 }
 setImmediate(frida_Module,0);
 
+/*
 输出如下：
 Java_com_roysue_roysueapplication_hellojni_getStr address: 0xdf2d413d
-Java_com_roysue_roysueapplication_hellojni_getStr address: 0xdf2d413d
+Java_com_roysue_roysueapplication_hellojni_getStr address: 0xdf2d413d */
 ```
 
 #### 1.4.9 Module.findBaseAddress(name)、Module.getBaseAddress(name)
@@ -408,7 +413,8 @@ function frida_Module() {
 }
 setImmediate(frida_Module,0);
 
+/*
 输出如下：
 so address: 0xdf2d3000
-so address: 0xdf2d3000
+so address: 0xdf2d3000 */
 ```
