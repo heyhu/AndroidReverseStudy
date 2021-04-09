@@ -22,15 +22,15 @@
     左面：内存地址。中间：数据的hex16进制表示 右边：数据的字符串显示 0X45 -> E
     */
     ```
-    和ida显示的一摸一样
+    和ida显示的一摸一样     
     ![](pic/01.a.png)
    
-2. 声明变量类型
-        索引	API	含义
-    1	new Int64(v)	定义一个有符号Int64类型的变量值为v，参数v可以是字符串或者以0x开头的的十六进制值
-    2	new UInt64(v)	定义一个无符号Int64类型的变量值为v，参数v可以是字符串或者以0x开头的的十六进制值
-    3	new NativePointer(s)	定义一个指针，指针地址为s
-    4	ptr(“0”)	同上
+2. 声明变量类型   
+        索引	API	含义  
+    1	new Int64(v)	定义一个有符号Int64类型的变量值为v，参数v可以是字符串或者以0x开头的的十六进制值    
+    2	new UInt64(v)	定义一个无符号Int64类型的变量值为v，参数v可以是字符串或者以0x开头的的十六进制值    
+    3	new NativePointer(s)	定义一个指针，指针地址为s   
+    4	ptr(“0”)	同上  
     ```js
      Java.perform(function () {
     console.log("");
@@ -40,22 +40,22 @@
     console.log("new ptr('0xEC644071'):"+new ptr(0xEC644071));
     });
     /*
-    输出效果如下：
-    new Int64(1):1
-    new UInt64(1):1
-    new NativePointer(0xEC644071):0xec644071
-    new ptr('0xEC644071'):0xec644071*/
-    ```
+    输出效果如下：    
+    new Int64(1):1 
+    new UInt64(1):1    
+    new NativePointer(0xEC644071):0xec644071   
+    new ptr('0xEC644071'):0xec644071*/ 
+    ``` 
    
-    frida也为Int64(v)提供了一些相关的API：
+    frida也为Int64(v)提供了一些相关的API： 
 
-    索引	API	含义
-    1	add(rhs)、sub(rhs)、and(rhs)、or(rhs)、xor(rhs)	加、减、逻辑运算
-    2	shr(N)、shl(n)	向右/向左移位n位生成新的Int64
-    3	Compare(Rhs)	返回整数比较结果
-    4	toNumber()	转换为数字
-    5	toString([radix=10])	转换为可选基数的字符串(默认为10)
-    代码如下：
+    索引	API	含义  
+    1	add(rhs)、sub(rhs)、and(rhs)、or(rhs)、xor(rhs)	加、减、逻辑运算    
+    2	shr(N)、shl(n)	向右/向左移位n位生成新的Int64  
+    3	Compare(Rhs)	返回整数比较结果    
+    4	toNumber()	转换为数字   
+    5	toString([radix=10])	转换为可选基数的字符串(默认为10)  
+    代码如下：   
     ```js
       function hello_type() {
         Java.perform(function () {
@@ -72,6 +72,6 @@
             console.log("8888 toString:"+new Int64("8888").toString());
         });
     }
-    ```
-    代码执行效果：
-    ![](pic/02.a.png)
+    ``` 
+    代码执行效果： 
+    ![](pic/02.a.png)   
