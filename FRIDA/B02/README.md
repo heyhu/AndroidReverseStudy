@@ -418,3 +418,217 @@ setImmediate(frida_Module,0);
 so address: 0xdf2d3000
 so address: 0xdf2d3000 */
 ```
+
+
+
+### 1.5 Memory对象
+
+`Memory`的一些`API`通常是对内存处理，譬如`Memory.copy()`复制内存，又如`writeByteArray`写入字节到指定内存中，那我们这章中就是学习使用`Memory API`向内存中写入数据、读取数据。
+
+#### 1.5.1 Memory.scan搜索内存数据
+
+其主要功能是搜索内存中以`address`地址开始，搜索长度为`size`，需要搜是条件是`pattern，callbacks`搜索之后的回调函数；此函数相当于搜索内存的功能。
+
+我们来直接看例子，然后结合例子讲解，如下图`1-5`。
+
+[![img](https://p0.ssl.qhimg.com/t012b2f2c69c430786a.png)](https://p0.ssl.qhimg.com/t012b2f2c69c430786a.png)
+
+​																			图1-5 IDA中so文件某处数据
+
+如果我想搜索在内存中`112A`地址的起始数据要怎么做，代码示例如下。
+
+```js
+function frida_Memory() {
+    Java.perform(function () {
+        //先获取so的module对象
+        var module = Process.findModuleByName("libhello.so"); 
+        //??是通配符
+        var pattern = "03 49 ?? 50 20 44";
+        //基址
+        console.log("base:"+module.base)
+        //从so的基址开始搜索，搜索大小为so文件的大小，搜指定条件03 49 ?? 50 20 44的数据
+        var res = Memory.scan(module.base, module.size, pattern, {
+            onMatch: function(address, size){
+                //搜索成功
+                console.log('搜索到 ' +pattern +" 地址是:"+ address.toString());  
+            }, 
+            onError: function(reason){
+                //搜索失败
+                console.log('搜索失败');
+            },
+            onComplete: function()
+            {
+                //搜索完毕
+                console.log("搜索完毕")
+            }
+          });
+    });
+}
+setImmediate(frida_Memory,0);
+```
+
+先来看看回调函数的含义，`onMatch：function(address，size)`：使用包含作为`NativePointer`的实例地址的`address`和指定大小为数字的`size`调用，此函数可能会返回字符串`STOP`以提前取消内存扫描。`onError：Function(Reason)`：当扫描时出现内存访问错误时使用原因调用。`onComplete：function()`：当内存范围已完全扫描时调用。
+
+我们来来说上面这段代码做了什么事情：搜索`libhello.so`文件在内存中的数据，搜索以`pattern`条件的在内存中能匹配的数据。搜索到之后根据回调函数返回数据。
+
+我们来看看执行之后的效果图`1-6`。
+
+[![img](https://p1.ssl.qhimg.com/t0162e674a6690c141c.png)](https://p1.ssl.qhimg.com/t0162e674a6690c141c.png)
+
+​																			图1-6 终端执行
+
+我们要如何验证搜索到底是不是图`1-5`中`112A`地址，其实很简单。`so`的基址是`0xdf2d3000`，而搜到的地址是`0xdf2d412a`，我们只要`df2d412a-df2d3000=112A`。就是说我们已经搜索到了！在ida中搜索也需要使用`112A`才能搜到。
+
+#### 1.5.2 搜索内存数据Memory.scanSync
+
+功能与`Memory.scan`一样，只不过它是返回多个匹配到条件的数据。
+代码示例如下。
+
+```js
+function frida_Memory() {
+    Java.perform(function () {
+        var module = Process.findModuleByName("libhello.so"); 
+        var pattern = "03 49 ?? 50 20 44";
+        var scanSync = Memory.scanSync(module.base, module.size, pattern);
+        console.log("scanSync:"+JSON.stringify(scanSync));
+    });
+}
+setImmediate(frida_Memory,0);
+
+/*
+输出如下，可以看到地址搜索出来是一样的
+scanSync:[{"address":"0xdf2d412a","size":6}] */
+```
+
+#### 1.5.3 内存分配Memory.alloc
+
+在目标进程中的堆上申请`size`大小的内存，并且会按照`Process.pageSize`对齐，返回一个`NativePointer`，并且申请的内存如果在`JavaScript`里面没有对这个内存的使用的时候会自动释放的。也就是说，如果你不想要这个内存被释放，你需要自己保存一份对这个内存块的引用。
+
+使用案例如下
+
+```js
+function frida_Memory() {
+    Java.perform(function () {
+        const r = Memory.alloc(10);
+        console.log(hexdump(r, {
+            offset: 0,
+            length: 10,
+            header: true,
+            ansi: false
+        }));
+    });
+}
+setImmediate(frida_Memory,0);
+```
+
+以上代码在目标进程中申请了`10`字节的空间~我们来看执行脚本的效果图`1-7`。
+
+[![img](https://p2.ssl.qhimg.com/t01315da1bd55915455.png)](https://p2.ssl.qhimg.com/t01315da1bd55915455.png)
+
+​															    图1-7 终端执行
+
+可以看到在`0xdfe4cd40`处申请了`10`个字节内存空间~
+
+也可以使用：
+`		Memory.allocUtf8String(str)` 分配utf字符串
+`Memory.allocUtf16String` 分配utf16字符串
+`Memory.allocAnsiString` 分配ansi字符串
+
+#### 1.5.4 内存复制Memory.copy
+
+如同`c api memcp`一样调用，使用案例如下。
+
+```js
+function frida_Memory() {
+    Java.perform(function () {
+        //获取so模块的Module对象
+        var module = Process.findModuleByName("libhello.so"); 
+        //条件
+        var pattern = "03 49 ?? 50 20 44";
+        //搜字符串 只是为了将so的内存数据复制出来 方便演示~
+        var scanSync = Memory.scanSync(module.base, module.size, pattern);
+        //申请一个内存空间大小为10个字节
+        const r = Memory.alloc(10);
+        //复制以module.base地址开始的10个字节 那肯定会是7F 45 4C 46...因为一个ELF文件的Magic属性如此。
+        Memory.copy(r,module.base,10);
+        console.log(hexdump(r, {
+            offset: 0,
+            length: 10,
+            header: true,
+            ansi: false
+        }));
+    });
+}
+setImmediate(frida_Memory,0);
+
+/*
+输出如下。
+           0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF
+e8142070  7f 45 4c 46 01 01 01 00 00 00                    .ELF......  */
+```
+
+从`module.base`中复制`10`个字节的内存到新年申请的`r`内
+
+#### 1.5.5 写入内存Memory.writeByteArray
+
+将字节数组写入一个指定内存，代码示例如下:
+
+```js
+function frida_Memory() {     
+    Java.perform(function () {
+        //定义需要写入的字节数组 这个字节数组是字符串"roysue"的十六进制
+        var arr = [ 0x72, 0x6F, 0x79, 0x73, 0x75, 0x65];
+        //申请一个新的内存空间 返回指针 大小是arr.length
+        const r = Memory.alloc(arr.length);
+        //将arr数组写入R地址中
+        Memory.writeByteArray(r,arr);
+        //输出
+        console.log(hexdump(r, {
+            offset: 0,
+            length: arr.length,
+            header: true,
+            ansi: false
+        }));  
+    });
+}
+setImmediate(frida_Memory,0);
+
+/*
+输出如下。
+           0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF
+00000000  72 6f 79 73 75 65                                roysue */
+```
+
+#### 1.5.6 读取内存Memory.readByteArray
+
+将一个指定地址的数据，代码示例如下:
+
+```js
+function frida_Memory() {     
+    Java.perform(function () {
+        //定义需要写入的字节数组 这个字节数组是字符串"roysue"的十六进制
+        var arr = [ 0x72, 0x6F, 0x79, 0x73, 0x75, 0x65];
+        //申请一个新的内存空间 返回指针 大小是arr.length
+        const r = Memory.alloc(arr.length);
+        //将arr数组写入R地址中
+        Memory.writeByteArray(r,arr);
+        //读取r指针，长度是arr.length 也就是会打印上面一样的值
+        var buffer = Memory.readByteArray(r, arr.length);
+        //输出
+        console.log("Memory.readByteArray:");
+        console.log(hexdump(buffer, {
+            offset: 0,
+            length: arr.length,
+            header: true,
+            ansi: false
+        }));
+      });
+}
+setImmediate(frida_Memory,0);
+
+/*
+输出如下。
+[Google Pixel::com.roysue.roysueapplication]-> Memory.readByteArray:
+           0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF
+00000000  72 6f 79 73 75 65                                roysue */
+```
