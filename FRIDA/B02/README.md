@@ -33,11 +33,11 @@
     4	ptr(“0”)	同上  
     ```js
      Java.perform(function () {
-    console.log("");
-    console.log("new Int64(1):"+new Int64(1));
-    console.log("new UInt64(1):"+new UInt64(1));
-    console.log("new NativePointer(0xEC644071):"+new NativePointer(0xEC644071));
-    console.log("new ptr('0xEC644071'):"+new ptr(0xEC644071));
+        console.log("");
+        console.log("new Int64(1):"+new Int64(1));
+        console.log("new UInt64(1):"+new UInt64(1));
+        console.log("new NativePointer(0xEC644071):"+new NativePointer(0xEC644071));
+        console.log("new ptr('0xEC644071'):"+new ptr(0xEC644071));
     });
     /*
     输出效果如下：    
@@ -73,5 +73,5 @@
         });
     }
     ``` 
-    代码执行效果： 
+    代码执行效果:     
     ![](pic/02.a.png)   
