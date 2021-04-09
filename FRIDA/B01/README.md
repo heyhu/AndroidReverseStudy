@@ -292,7 +292,7 @@
     ```
     
 28. Java.available
-    ```js
+    ```
         // 该函数一般用来判断当前进程是否加载了JavaVM，Dalvik或ART虚拟机
         function frida_Java() {
             Java.perform(function () {
@@ -309,15 +309,14 @@
         }       
         setImmediate(frida_Java,0);
         
-        /*
         输出如下。
         hello java vm
         核心注入的逻辑代码写在<注入的逻辑代码>内会非常的安全万无一失~ 
-       */
+       
     ```
 
 29. Java.androidVersion     
-    ```js
+    ```
      // 显示android系统版本号
     function frida_Java() {
         Java.perform(function () {
@@ -333,10 +332,10 @@
         });
     }       
     setImmediate(frida_Java,0);
-    /*
+    
     输出如下。
     9 ,因为我的系统版本是9版本~  
-    */
+
     ```    
 
 30. 获取类Java.use 
