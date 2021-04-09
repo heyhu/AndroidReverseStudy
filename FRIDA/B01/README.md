@@ -290,3 +290,94 @@
         onComplete: function() {}
     });
     ```
+    
+28. Java.available
+    ```js
+        // 该函数一般用来判断当前进程是否加载了JavaVM，Dalvik或ART虚拟机
+        function frida_Java() {
+            Java.perform(function () {
+                //作为判断用
+                if(Java.available)
+                {
+                    //注入的逻辑代码
+                    console.log("hello java vm");
+                }else{
+                    //未能正常加载JAVA VM
+                    console.log("error");
+                }
+            });
+        }       
+        setImmediate(frida_Java,0);
+        
+        /*
+        输出如下。
+        hello java vm
+        核心注入的逻辑代码写在<注入的逻辑代码>内会非常的安全万无一失~ */
+    ```
+
+29. Java.androidVersion     
+    ```js
+     // 显示android系统版本号
+    function frida_Java() {
+        Java.perform(function () {
+            //作为判断用
+            if(Java.available)
+            {
+                //注入的逻辑代码
+                console.log("",Java.androidVersion);
+            }else{
+                //未能正常加载JAVA VM
+                console.log("error");
+            }
+        });
+    }       
+    setImmediate(frida_Java,0);
+    /*
+    输出如下。
+    9
+    因为我的系统版本是9版本~  */
+    ```    
+
+30. 获取类Java.use 
+    ```js
+     // Java.use(className)，动态获取className的类定义，通过对其调用$new()来调用构造函数，可以从中实例化对象。当想要回收类时可以调用$Dispose()方法显式释放，当然也可以等待JavaScript的垃圾回收机制，当实例化一个对象之后，可以通过其实例对象调用类中的静态或非静态的方法，官方代码示例定义如下。
+
+    Java.perform(function () {
+      //获取android.app.Activity类
+      var Activity = Java.use('android.app.Activity');
+      //获取java.lang.Exception类
+      var Exception = Java.use('java.lang.Exception');
+      //拦截Activity类的onResume方法
+      Activity.onResume.implementation = function () {
+        //调用onResume方法的时候，会在此处被拦截并且调用以下代码抛出异常！
+        throw Exception.$new('Oh noes!');
+      };
+    });
+    ```
+
+31. Java.vm对象
+    ```js
+     //Java.vm对象十分常用，比如想要拿到JNI层的JNIEnv对象，可以使用getEnv()；我们来看看具体的使用和基本小实例。~
+
+    function frida_Java() {     
+        Java.perform(function () {
+             //拦截getStr函数
+             Interceptor.attach(Module.findExportByName("libhello.so" , "Java_com_roysue_roysueapplication_hellojni_getStr"), {
+                onEnter: function(args) {
+                    console.log("getStr");
+                },
+                onLeave:function(retval){
+                    //它的返回值的是retval 在jni层getStr的返回值的jstring 
+                    //我们在这里做的事情就是替换掉结果
+                    //先获取一个Env对象
+                    var env = Java.vm.getEnv();
+                    //通过newStringUtf方法构建一个jstirng字符串
+                    var jstring = env.newStringUtf('roysue');
+                    //replace替换掉结果
+                    retval.replace(jstring);
+                    console.log("getSum方法返回值为:roysue")
+                }
+        });
+    })}
+    setImmediate(frida_Java,0);
+   ```
