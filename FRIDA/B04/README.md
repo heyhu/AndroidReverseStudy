@@ -3,7 +3,7 @@
 
 ### 1.1.1 IDA结构化JNIEnv
 
- 		IDA 分析Android so 文件时，因为缺少JNIEnv结构定义，反编译后看起来很不友好，需要导入`jni.h`使JNIEnv 的结构定义让反编译代码看起来更轻松，就可以看到函数名，例如：_JNIEnv::GetStringUTFLength();
+ IDA 分析Android so 文件时，因为缺少JNIEnv结构定义，反编译后看起来很不友好，需要导入`jni.h`使JNIEnv 的结构定义让反编译代码看起来更轻松，就可以看到函数名，例如：_JNIEnv::GetStringUTFLength();
 
   	找到本机的`jni.h`，在`Android/sdk`下，`tree -NCfhl | grep -i jni.h`，打开ida，点`File->Load file->Parse C header file` 找到jni.h所在位置导入。如果没有识别，按y键。
 
