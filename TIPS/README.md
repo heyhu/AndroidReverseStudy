@@ -69,3 +69,4 @@
 3. Wallbreaker：内存漫游
 4. ZenTracer：批量hook  
 5. DEXDump/FART/Youpk：脱壳
+6. jadx 最新版支持多选dex文件
