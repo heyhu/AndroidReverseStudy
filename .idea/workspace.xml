@@ -20,16 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a4383cff-8198-436f-a32a-abe9b7f93ea7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/拓展/02/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.a.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.b.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.c.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.d.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.e.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/拓展/02/pic/02.a.webp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/拓展/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/拓展/01/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/拓展/02/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/拓展/02/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +93,7 @@
       <workItem from="1617788091508" duration="13676000" />
       <workItem from="1617871130287" duration="999000" />
       <workItem from="1617933284427" duration="15128000" />
-      <workItem from="1618282142370" duration="4985000" />
+      <workItem from="1618282142370" duration="5331000" />
     </task>
     <servers />
   </component>

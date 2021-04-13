@@ -145,77 +145,79 @@ Java_com_noguess_demoso1_MainActivity_myfirstjni(
 
    JNI数据类型和java数据类型关系如下：
 
-   <img src="pic/02.a.webp" style="zoom:40%;" />
+   <img src="pic/02.a.webp" style="zoom:50%;" />
 
-   8. 开发一个简单的JNI -> HELLO WORD
+8. 开发一个简单的JNI -> HELLO WORD
 
-      ##### java source code view：
+   ##### java source code view：
 
-      ```java
-      package com.noguess.demoso1;
-      import androidx.appcompat.app.AppCompatActivity;
-      import android.os.Bundle;
-      import android.util.Log;
-      import android.widget.TextView;
-      
-      import java.lang.reflect.Field;
-      
-      public class MainActivity extends AppCompatActivity {
-          // Used to load the 'native-lib' library on application startup.
-          static {
-              System.loadLibrary("native-lib");
-          }
-      
-          @Override
-          protected void onCreate(Bundle savedInstanceState) {
-              super.onCreate(savedInstanceState);
-              setContentView(R.layout.activity_main);
-      
-              // Example of a call to a native method
-              TextView tv = findViewById(R.id.sample_text);
-              tv.setText(stringFromJNI());
-              // 调用动态方法
-              Log.i("r0add", String.valueOf(this.myfirstjni()));
-              // 调用静态方法
-              Log.i("r0add", MainActivity.myfirstjniJNI("from JAVA"));
-          }
-      
-          /**
-           * A native method that is implemented by the 'native-lib' native library,
-           * which is packaged with this application.
-           */
-          public native String stringFromJNI();
-          // 静态方法
-          public static native String myfirstjniJNI(String context);
-          public native int myfirstjni();
-      }
-      ```
+   ```java
+   package com.noguess.demoso1;
+   import androidx.appcompat.app.AppCompatActivity;
+   import android.os.Bundle;
+   import android.util.Log;
+   import android.widget.TextView;
+   
+   import java.lang.reflect.Field;
+   
+   public class MainActivity extends AppCompatActivity {
+       // Used to load the 'native-lib' library on application startup.
+       static {
+           System.loadLibrary("native-lib");
+       }
+   
+       @Override
+       protected void onCreate(Bundle savedInstanceState) {
+           super.onCreate(savedInstanceState);
+           setContentView(R.layout.activity_main);
+   
+           // Example of a call to a native method
+           TextView tv = findViewById(R.id.sample_text);
+           tv.setText(stringFromJNI());
+           // 调用动态方法
+           Log.i("r0add", String.valueOf(this.myfirstjni()));
+           // 调用静态方法
+           Log.i("r0add", MainActivity.myfirstjniJNI("from JAVA"));
+       }
+   
+       /**
+        * A native method that is implemented by the 'native-lib' native library,
+        * which is packaged with this application.
+        */
+       public native String stringFromJNI();
+       // 静态方法
+       public static native String myfirstjniJNI(String context);
+       public native int myfirstjni();
+   }
+   ```
 
-      ##### Native source code view：
+   ##### Native source code view：
 
-      ```c++
-      extern "C" JNIEXPORT jstring JNICALL
-      // 固定格式
-      Java_com_noguess_demoso1_MainActivity_myfirstjniJNI(
-          	// 固定参数
-              JNIEnv *env,
-          	// 静态 -> jclass, 动态 -> jobject
-              jclass clazz,
-          	// 参数
-              jstring context) {
-          // c++的写法
-          const char* a = env->GetStringUTFChars(context, nullptr);
-          
-          int a_size = env->GetStringUTFLength(context);
-          if(a!=0){
-      //        LOGI('now a is %s', a);
-      //        LOGI('new context is %s', context);
-          }
-          // 不用的对象释放掉
-          env->ReleaseStringUTFChars(context, a);
-          // 创建一个utf-8字符串
-          jstring result = env->NewStringUTF("Hello I`am from myfirstjniJNI");
-          return result;
-      ```
+   ```c++
+   extern "C" JNIEXPORT jstring JNICALL
+   // 固定格式
+   Java_com_noguess_demoso1_MainActivity_myfirstjniJNI(
+       	// 固定参数
+           JNIEnv *env,
+       	// 静态 -> jclass, 动态 -> jobject
+           jclass clazz,
+       	// 参数
+           jstring context) {
+       // c++的写法
+       const char* a = env->GetStringUTFChars(context, nullptr);
+       
+       int a_size = env->GetStringUTFLength(context);
+       if(a!=0){
+   //        LOGI('now a is %s', a);
+   //        LOGI('new context is %s', context);
+       }
+       // 不用的对象释放掉
+       env->ReleaseStringUTFChars(context, a);
+       // 创建一个utf-8字符串
+       jstring result = env->NewStringUTF("Hello I`am from myfirstjniJNI");
+       return result;
+   ```
 
-      
+9. JNI数据类型和java数据类型关系如下：
+
+   
