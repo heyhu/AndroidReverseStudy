@@ -12,8 +12,9 @@
         3. 参数/返回值替换  
         4. 调用栈打印    
         5. 通过param.thisObject 来获取实例          
-        6. 获取类的两种方法      
-           1. XposedHelpers.findClass     
+        6. 获取类的两种方法: 
+
+           1. XposedHelpers.findClass
            2. loadPackageParam.classLoader.loadClas(className)   
   
 - [Hook XposedBridge hookAllMethods方法](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookAllMethod.java)   
@@ -44,7 +45,7 @@
     内涵技术栈：  
         1. 过滤系统版本   
         2. 打印进程名    
-        3. 打印包名 
+        3. 打印包名    
         4. 获取ClassLoader,用于查找包名等。   
 
 - [Hook 多dex apk](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookMoreDex.java)      
@@ -55,7 +56,7 @@
 - [主动调用内存爆破](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookVerifier.java)  
   内涵技术栈：    
       1. XposedHelpers.callStaticMethod 主动调用    
-      2. 反射主动调用 
+      2. 反射主动调用   
       3. context构造  
    
 - [NanoHttpd 算法主动暴露](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookVerifier.java)  
