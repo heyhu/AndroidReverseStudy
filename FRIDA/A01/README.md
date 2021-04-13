@@ -32,3 +32,8 @@
         2. %reload 用来重新加载脚本  
         3. Frida   用命令行启动frida时,进入交互界面后，查看环境  
         4. console.log('hello') 可以直接运行js命令  
+
+9. frida hook原理
+   > 启动frida-server时会注入so，在so层进行java层反射。
+   ![](pic/03.a.png)
+   ![](pic/04.a.png)
