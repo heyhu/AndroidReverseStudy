@@ -75,9 +75,9 @@
     > 因为 HookMessage implements IXposedHookLoadPackage， 此类实现了接口，所以搜索不到，他不属于原本的包。
 
 - 查找 HookMessage 为什么会出现两个？
-  ![](pic/01.a.png)         
+  ![](pic/01.a.png)     
   > HookMessage下的XC_MethodHook 就是 HookMessage$1 ,他是匿名的内部类，它有 beforeHookedMethod和 afterHookedMethod 两个方法，如果想hook XC_MethodHook 函数，那么就需要hook  HookMessage$1，
-     假如一个类有多个hook 方法比如多个XC_MethodHook ，那么就具有多个HookMessage内部类，比如HookMessage$1、HookMessage$2等。
+    假如一个类有多个hook 方法比如多个XC_MethodHook ，那么就具有多个HookMessage内部类，比如HookMessage$1、HookMessage$2等。
 
 - 如何定位className、XC_MethodHook 是属于哪个进程的内部类。  
   > if (loadPackageParam.packageName.equals("com.example.xposed1")) {    
