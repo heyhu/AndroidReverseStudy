@@ -218,7 +218,3 @@ Java_com_noguess_demoso1_MainActivity_myfirstjni(
        jstring result = env->NewStringUTF("Hello I`am from myfirstjniJNI");
        return result;
    ```
-
-9. JNI数据类型和java数据类型关系如下：
-
-   
