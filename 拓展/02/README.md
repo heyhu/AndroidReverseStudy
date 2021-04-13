@@ -218,3 +218,87 @@ Java_com_noguess_demoso1_MainActivity_myfirstjni(
        jstring result = env->NewStringUTF("Hello I`am from myfirstjniJNI");
        return result;
    ```
+
+
+
+## 1.4 动态注册
+
+如今许多开发者都出于**安全性考虑**或其他需求，不愿使用函数名规则绑定，而是自己动态注册来绑定native函数。方法也很简单，只需调用`RegisterNatives`函数即可。其申明如下：
+
+```c++
+jint RegisterNatives(jclass clazz, const JNINativeMethod* methods,jint nMethods)
+```
+
+`clazz` 就是native函数所在的类，可通过`FindClass`获取(将.换成/);`methods`是一个数组，其中包含注册信息。
+
+##### java source code view：
+
+```java
+public static native String stringFromJNI2();
+```
+
+##### Native source code view：
+
+```c++
+// 动态注册: so
+JNIEXPORT jstring JNICALL stringFromJNI2(JNIEnv* env, jclass clazz) {
+    std::string hello = "Hello from C++ stringFromJNI2";
+    return env->NewStringUTF(hello.c_str());
+}
+
+JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
+{
+    JNIEnv * env;
+    // 从java虚拟机中获取java env
+    vm->GetEnv((void**)&env,JNI_VERSION_1_6);
+    // 注册信息
+    JNINativeMethod methods[] = {
+            // 签名()Ljava/lang/String; 括号里是参数, 返回值是一个jstring
+            // name:stringFromJNI2 是与java层 public static native String stringFromJNI2();对应的
+            {"stringFromJNI2","()Ljava/lang/String;",(void*)stringFromJNI2},
+    };
+    // FindClass寻找类
+    // RegisterNatives为env的函数，代表此函数可以hook。
+    // RegisterNatives参数详解：FindClass寻找类 methods：方法数组 1：方法个数
+    env->RegisterNatives(env->FindClass("com/example/demoso1/MainActivity"),methods,1);
+    return JNI_VERSION_1_6;
+}
+```
+
+#####  JNI ONLOAD
+
+如果代码中已经实现了，那么ida中就可以搜索到。JNI ONLOAD是一个回调，加载一个so时会自动执行。
+
+![](pic/02.b.png)
+
+ida中代码：
+
+```c++
+{
+  unsigned __int64 v1; // x8
+  unsigned __int64 v2; // ST20_8
+  void *v3; // ST10_8
+  __int64 v4; // x0
+  __int64 result; // x0
+  void *v6; // [xsp+38h] [xbp-28h]
+  __int128 v7; // [xsp+40h] [xbp-20h]
+  __int64 (__fastcall *v8)(int, int, int, int, int, int, int, int, int, int, __int64); // [xsp+50h] [xbp-10h]
+  __int64 v9; // [xsp+58h] [xbp-8h]
+
+  v1 = _ReadStatusReg(ARM64_SYSREG(3, 3, 13, 0, 2));
+  v9 = *(_QWORD *)(v1 + 40);
+  v2 = v1;
+  // 源码：vm->GetEnv((void**)&env,JNI_VERSION_1_6),所以v6就是env,可以按y键重命名方便观看。
+  _JavaVM::GetEnv(a1, &v6, 65542);
+  // v8就是动态注册的函数名
+  v8 = stringFromJNI2;
+  v7 = off_32CB8;
+  v3 = v6;
+  v4 = _JNIEnv::FindClass((_JNIEnv *)v6, "com/example/demoso1/MainActivity");
+  result = _JNIEnv::RegisterNatives(v3, v4, &v7, 1LL);
+  if ( *(_QWORD *)(v2 + 40) == v9 )
+    result = 65542LL;
+  return result;
+}
+```
+
