@@ -11,8 +11,8 @@
         2. 参数/返回值打印  
         3. 参数/返回值替换  
         4. 调用栈打印    
-        5. 通过param.thisObject 来获取实例 
-        7. 获取类的两种方法      
+        5. 通过param.thisObject 来获取实例          
+        6. 获取类的两种方法      
            1. XposedHelpers.findClass     
            2. loadPackageParam.classLoader.loadClas(className)   
   
