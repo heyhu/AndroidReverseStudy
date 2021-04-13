@@ -20,8 +20,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a4383cff-8198-436f-a32a-abe9b7f93ea7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/拓展/02/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.a.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.b.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.c.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.d.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/拓展/02/pic/01.e.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/拓展/02/pic/02.a.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TIPS/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/拓展/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/拓展/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/拓展/01/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,16 +74,18 @@
     <property name="settings.editor.selected.configurable" value="Settings.Markdown" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/FRIDA/B01/pic" />
-      <recent name="$PROJECT_DIR$/FRIDA/A02/pic" />
-      <recent name="$PROJECT_DIR$/FRIDA/A01/pic" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/FRIDA/B02" />
       <recent name="$PROJECT_DIR$/FRIDA/B01" />
       <recent name="$PROJECT_DIR$/FRIDA/A02" />
       <recent name="$PROJECT_DIR$/TOOLS" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/拓展/02/pic" />
+      <recent name="$PROJECT_DIR$/拓展/01" />
+      <recent name="$PROJECT_DIR$/FRIDA/B01/pic" />
+      <recent name="$PROJECT_DIR$/FRIDA/A02/pic" />
+      <recent name="$PROJECT_DIR$/FRIDA/A01/pic" />
     </key>
   </component>
   <component name="SvnConfiguration">
@@ -92,7 +102,7 @@
       <workItem from="1617788091508" duration="13676000" />
       <workItem from="1617871130287" duration="999000" />
       <workItem from="1617933284427" duration="15128000" />
-      <workItem from="1618282142370" duration="1340000" />
+      <workItem from="1618282142370" duration="4985000" />
     </task>
     <servers />
   </component>
