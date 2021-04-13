@@ -24,7 +24,7 @@
 - [01.XPOSED配置](https://www.freebuf.com/articles/terminal/189021.html)
 
 ## B.Xposed API篇
-- [01.Xposed API 实例讲解](FRIDA/B01/README.md)
+- [01.Xposed API 实例讲解](XPOSED/B01/README.md)
 
 ---
 
