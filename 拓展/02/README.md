@@ -106,6 +106,8 @@ Java_com_noguess_demoso1_MainActivity_myfirstjni(
 }
 ```
 
+  `stringFromJNI` 加了一个**native**描述符，表示是一个原生函数，`MainActivity`是类名，`com_noguess_demoso1`是包名，`Java_com_noguess_demoso1_MainActivity_stringFromJNI`是对应的C函数名，那么这个规则就很显而易见了，将包名的.替换成_(因为.不能用于函数命名)，然后`Java_PackName_CLassName_MethodName`。**运行时，JNI就会依赖此规则来对函数进行绑定**。
+
 注释：
 
 1. jstring JNICALL 指返回的类型为string。

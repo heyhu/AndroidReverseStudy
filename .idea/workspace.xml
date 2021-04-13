@@ -20,8 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a4383cff-8198-436f-a32a-abe9b7f93ea7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/FRIDA/B04/pic/01.a.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FRIDA/B04/pic/01.b.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FRIDA/B04/pic/01.c.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/拓展/02/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/拓展/02/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FRIDA/B04/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/FRIDA/B04/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,11 +76,11 @@
       <recent name="$PROJECT_DIR$/TOOLS" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/FRIDA/B04/pic" />
       <recent name="$PROJECT_DIR$/拓展/02/pic" />
       <recent name="$PROJECT_DIR$/拓展/01" />
       <recent name="$PROJECT_DIR$/FRIDA/B01/pic" />
       <recent name="$PROJECT_DIR$/FRIDA/A02/pic" />
-      <recent name="$PROJECT_DIR$/FRIDA/A01/pic" />
     </key>
   </component>
   <component name="SvnConfiguration">
@@ -94,7 +97,7 @@
       <workItem from="1617788091508" duration="13676000" />
       <workItem from="1617871130287" duration="999000" />
       <workItem from="1617933284427" duration="15128000" />
-      <workItem from="1618282142370" duration="6136000" />
+      <workItem from="1618282142370" duration="7232000" />
     </task>
     <servers />
   </component>
