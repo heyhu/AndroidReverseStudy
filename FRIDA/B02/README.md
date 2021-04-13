@@ -19,9 +19,9 @@ hexdump，其含义:打印内存中的地址，target参数可以是ArrayBuffer�
  /*
  0x78472c1000
               0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF
- 78472c1000  7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00  .ELF............
- 78472c1010  03 00 b7 00 01 00 00 00 c0 fe 00 00 00 00 00 00  ................
- 78472c1020  40 00 00 00 00 00 00 00 f8 a1 03 00 00 00 00 00  @...............
+ 78472c1000  7f 45 4c 46 A01 A01 A01 00 00 00 00 00 00 00 00 00  .ELF............
+ 78472c1010  A02 00 b7 00 A01 00 00 00 c0 fe 00 00 00 00 00 00  ................
+ 78472c1020  40 00 00 00 00 00 00 00 f8 a1 A02 00 00 00 00 00  @...............
  78472c1030  00 00 00 00 40 00 38 00 08 00 40 00 19 00 18 00  ....@.8...@.....
  左面：内存地址。中间：数据的hex16进制表示 右边：数据的字符串显示 0X45 -> E
  */
@@ -443,7 +443,7 @@ function frida_Memory() {
         //先获取so的module对象
         var module = Process.findModuleByName("libhello.so"); 
         //??是通配符
-        var pattern = "03 49 ?? 50 20 44";
+        var pattern = "A02 49 ?? 50 20 44";
         //基址
         console.log("base:"+module.base)
         //从so的基址开始搜索，搜索大小为so文件的大小，搜指定条件03 49 ?? 50 20 44的数据
@@ -488,7 +488,7 @@ setImmediate(frida_Memory,0);
 function frida_Memory() {
     Java.perform(function () {
         var module = Process.findModuleByName("libhello.so"); 
-        var pattern = "03 49 ?? 50 20 44";
+        var pattern = "A02 49 ?? 50 20 44";
         var scanSync = Memory.scanSync(module.base, module.size, pattern);
         console.log("scanSync:"+JSON.stringify(scanSync));
     });
@@ -544,7 +544,7 @@ function frida_Memory() {
         //获取so模块的Module对象
         var module = Process.findModuleByName("libhello.so"); 
         //条件
-        var pattern = "03 49 ?? 50 20 44";
+        var pattern = "A02 49 ?? 50 20 44";
         //搜字符串 只是为了将so的内存数据复制出来 方便演示~
         var scanSync = Memory.scanSync(module.base, module.size, pattern);
         //申请一个内存空间大小为10个字节
@@ -564,7 +564,7 @@ setImmediate(frida_Memory,0);
 /*
 输出如下。
            0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF
-e8142070  7f 45 4c 46 01 01 01 00 00 00                    .ELF......  */
+e8142070  7f 45 4c 46 A01 A01 A01 00 00 00                    .ELF......  */
 ```
 
 从`module.base`中复制`10`个字节的内存到新年申请的`r`内
