@@ -15,7 +15,7 @@
         6. 获取类的两种方法: 
 
            1. XposedHelpers.findClass
-           2. loadPackageParam.classLoader.loadClas(className)   
+           2. loadPackageParam.classLoader.loadClass(className)   
   
 - [Hook XposedBridge hookAllMethods方法](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookAllMethod.java)   
     内涵技术栈：  
@@ -75,7 +75,7 @@
     > 因为 HookMessage implements IXposedHookLoadPackage， 此类实现了接口，所以搜索不到，他不属于原本的包。
 
 - 查找 HookMessage 为什么会出现两个？
-  ![](pic/01.a.png)     
+  ![](pic/01.a.png)         
   > HookMessage下的XC_MethodHook 就是 HookMessage$1 ,他是匿名的内部类，它有 beforeHookedMethod和 afterHookedMethod 两个方法，如果想hook XC_MethodHook 函数，那么就需要hook  HookMessage$1，
      假如一个类有多个hook 方法比如多个XC_MethodHook ，那么就具有多个HookMessage内部类，比如HookMessage$1、HookMessage$2等。
 
@@ -84,6 +84,6 @@
         查看进程名等于谁，就可以找到。hook 的包名为com.example.xposed1
 
 - 构造函数解释    
-  ![](pic/02.a.png) 
+  ![](pic/02.a.png)         
    java初始化设置属性的时候，是用构造函数来设置的。new DemoHelper("123") 给类传参数。
    XposedHelpers.findConstructorExact(CLASS_SHOW_STACK_ACTION_BUTTON_EVENT, cl, boolean.class).newInstance(true));
