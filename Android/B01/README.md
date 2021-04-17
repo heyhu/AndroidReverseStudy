@@ -86,7 +86,7 @@
 ## 拓展Swap
 
 ```
-dd if=/dev/zero of=swapfile bs=1M count=1024
+dd if=/dev/zero of=swapfile bs=1M count=10240
 mkswap swapfile  `mkswap创建交换文件`
 swapon swapfile  `swapon激活` 
 ```
