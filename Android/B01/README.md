@@ -143,7 +143,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 100
 
 > 当出现heap不足时有两种解决办法：打开prebuilts/sdk/tools/jack-admin对JACK_SERVER_COMMAND增加-Xmx4096m选项，-cp 前面加
 >
-> 修改完成后重启jack-admin服务：./jack-admin kill-server、jack-admin start-server
+> 修改完成后重启jack-admin服务：./jack-admin kill-server、./jack-admin start-server
 >
 >  Android8貌似不用
 
