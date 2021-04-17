@@ -10,7 +10,7 @@
 
   > Android7.1.2搜索android-7.1.2_r8，此版本支持机型最多, 选择前面的Build名称N2G47O
 
-- Factory Images下载
+- [Factory Images下载](https://developers.google.com/android/images)
 
   > 搜索上面提前的Build号搜索，会有好多版本
   >
@@ -20,7 +20,7 @@
   > | ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
   > | 7.1.2 (N2G47O, May 2017) | [Link](https://dl.google.com/dl/android/aosp/sailfish-n2g47o-factory-f2bc8024.zip) | f2bc8024b015fdf1e79d0ae3da187cb0c371c7fd5a24e384abe75a0c7c1bdb41 |
 
-- Driver Binaries
+- [Driver Binaries设备驱动下载](https://developers.google.com/android/drivers)
 
   > Pixel binaries for Android 7.1.2 (N2G47O) 两个链接都下载下来
 
