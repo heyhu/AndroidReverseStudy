@@ -1,13 +1,5 @@
 ## 编译目标Android 7.1.2
 
-- 参考链接  
-
-  > https://www.anquanke.com/post/id/199898
-  >
-  > https://blog.seeflower.dev/archives/12/
-  >
-  > https://blog.csdn.net/click_idc/article/details/80591686
-
 - [源码下载链接: r0ysue编译好的源码](https://github.com/heyhu/AndroidSecurityStudy) 
 
   > 注: 内含多个解压文件，只要解压aosp712r8.zip就行
@@ -226,3 +218,12 @@ adb shell getprop ro.build.date
 如果刷机碰到`error: Cannot generate image for userdata`报错
 编辑flash-all.sh，把`-w`去掉，重新刷机
 
+
+
+## 参考链接  
+
+> https://www.anquanke.com/post/id/199898
+>
+> https://blog.seeflower.dev/archives/12/
+>
+> https://blog.csdn.net/click_idc/article/details/80591686
