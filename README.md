@@ -34,7 +34,7 @@
 - [02.JNIEnv与反射](Android/A02/README.md)
 
 ## B.安卓源码编译
-- [01.AOSP刷入7.1.2_r8](Android/B01/README.md)
+- [01.AOSP源码编译7.1.2_r8](Android/B01/README.md)
 
 ---
 
