@@ -151,7 +151,7 @@ public abstract class MessageDigest extends MessageDigestSpi {
 # make update-api 更新改动
 # make -j4
 ```
-
+编译成功后刷入手机。
 
 
 ## 效果如下
