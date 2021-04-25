@@ -164,9 +164,11 @@ public abstract class MessageDigest extends MessageDigestSpi {
 
 > http://wuxiaolong.me/2018/08/15/AOSP3/
 >
-> [http://aosp.opersys.com/xref/android-8.1.0_r81/xre...](http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/openjdk_java_files.mk#61)
+> http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/openjdk_java_files.mk#61
 >
 > http://aosp.opersys.com/
 >
 > https://cs.android.com/
+> 
+> https://source.android.com/setup/build/building
 
