@@ -25,7 +25,7 @@
 
 ## 修改源码
 
-首先要找到对应目标文件在源码哪个目录下,在[源码](http://aosp.opersys.com/xref/android-8.1.0_r81/search?q=MessageDigest.java&project=libcore中搜索MessageDigest.java。可以看到对应路径。
+首先要找到对应目标文件在源码哪个目录下,在[源码](http://aosp.opersys.com/xref/android-8.1.0_r81/search?q=MessageDigest.java&project=libcore中搜索MessageDigest.java)。可以看到对应路径。
 
 <img src="/Android/B02/pic/01.a.png" style="zoom:40%;" />
 
