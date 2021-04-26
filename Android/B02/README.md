@@ -1,10 +1,10 @@
 ## 编译目标Android 7.1.2
 
-> 目的：aosp源码修改MessageDigest.java 文件，实现入参和返回值的自吐。
->
-> 环境：以下编译前环境准备、刷机都同于[AOSP源码编译篇](/Android/B01/README.md)
-> 
-> 系统产出：无root模式
+- 目的：aosp源码修改MessageDigest.java 文件，实现入参和返回值的自吐。
+
+- 环境：以下编译前环境准备、刷机都同于[AOSP源码编译篇](/Android/B01/README.md)
+
+- 系统产出：无root模式
 
 
 
@@ -21,6 +21,7 @@
 - 导入Android Studio
 
   > 打开 Android Studio，选择 Open an existing Android Studio project，找到源码目录，点击 Android.ipr，Open，大约等 6 分钟，导入完毕。
+
 
 
 ## 修改源码
