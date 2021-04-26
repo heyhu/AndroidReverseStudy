@@ -2,9 +2,9 @@
 
 > 目的：aosp源码修改MessageDigest.java 文件，实现入参和返回值的自吐。
 >
+> 环境：以下编译前环境准备、刷机都同于[AOSP源码编译篇](/Android/B01/README.md)
+> 
 > 系统产出：无root模式
->
-> 环境：以下编译前环境准备、刷机都同于[AOSP源码编译篇](Android/B01/README.md)
 
 
 
@@ -23,11 +23,9 @@
   > 打开 Android Studio，选择 Open an existing Android Studio project，找到源码目录，点击 Android.ipr，Open，大约等 6 分钟，导入完毕。
 
 
-
-
 ## 修改源码
 
-首先要找到对应目标文件在源码哪个目录下,在[源码](http://aosp.opersys.com/xref/android-8.1.0_r81/search?q=MessageDigest.java&project=libcore中搜索MessageDigest.java。可以看到对应路径。
+首先要找到对应目标文件在源码哪个目录下,在[源码](http://aosp.opersys.com/xref/android-8.1.0_r81/search?q=MessageDigest.java&project=libcore中搜索MessageDigest.java)中查找，可以看到对应路径。
 
 <img src="/Android/B02/pic/01.a.png" style="zoom:40%;" />
 
@@ -153,7 +151,7 @@ public abstract class MessageDigest extends MessageDigestSpi {
 # make update-api 更新改动
 # make -j4
 ```
-
+编译成功后刷入手机。
 
 
 ## 效果如下
@@ -166,9 +164,11 @@ public abstract class MessageDigest extends MessageDigestSpi {
 
 > http://wuxiaolong.me/2018/08/15/AOSP3/
 >
-> [http://aosp.opersys.com/xref/android-8.1.0_r81/xre...](http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/openjdk_java_files.mk#61)
+> http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/openjdk_java_files.mk#61
 >
 > http://aosp.opersys.com/
 >
 > https://cs.android.com/
+> 
+> https://source.android.com/setup/build/building
 
