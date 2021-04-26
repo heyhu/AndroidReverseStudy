@@ -63,6 +63,9 @@
                  
 - 遇到Frida反调试咋整？修改AOSP源码打印
   > https://bbs.pediy.com/thread-255653.htm
+  
+- 强制安装32位apk
+  > adb install --abi armeabi-v7a  xxx.apk
 
 
 ### Tool
