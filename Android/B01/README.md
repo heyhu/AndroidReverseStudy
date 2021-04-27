@@ -145,7 +145,7 @@ update-alternatives --install /usr/bin/python python /usr/bin/python3 100
 >
 > 修改完成后重启jack-admin服务：./jack-admin kill-server、./jack-admin start-server
 >
->  Android8貌似不用
+>  Android8编译的时候也需要加入
 
 ![03.a](pic/03.a.png)
 
