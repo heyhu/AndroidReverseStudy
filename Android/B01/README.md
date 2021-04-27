@@ -32,7 +32,7 @@
 
   > kali / kali
 
--  添加超级管理员权限
+- 添加超级管理员权限
 
   > sudo passwd root
 
