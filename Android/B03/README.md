@@ -109,6 +109,227 @@ import javax.security.auth.callback.*;
     }
 ```
 
+### 沙箱自吐Http请求与响应
+
+在源码中搜索java.net.SocketInputStream\java.net.SocketOutputStream
+
+![05.a](/Android/B03/pic/05.a.png)
+
+修改内容如下：
+
+```java
+// java.net.SocketInputStream
+
+package java.net;
+
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
+
+import dalvik.system.BlockGuard;
+import sun.net.ConnectionResetException;
+
+    private int socketRead(FileDescriptor fd,
+                           byte b[], int off, int len,
+                           int timeout)
+        throws IOException {
+        int result = socketRead0(fd, b, off, len, timeout);
+
+        if(result>0){
+            byte[] input = new byte[result];
+            System.arraycopy(b,off,input,0,result);
+
+            String inputString = new String(input);
+            Class logClass = null;
+            try {
+                logClass = this.getClass().getClassLoader().loadClass("android.util.Log");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            Method loge = null;
+            try {
+                loge = logClass.getMethod("e",String.class,String.class);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            try {
+                loge.invoke(null,"r0ysueSOCKETresponse","Socket is => "+this.socket.toString());
+                loge.invoke(null,"r0ysueSOCKETresponse","buffer is => "+inputString);
+                Exception e = new Exception("r0ysueSOCKETresponse");
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return result;
+    }
+```
+
+```java
+// java.net.SocketOutputStream
+
+package java.net;
+
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
+
+import dalvik.system.BlockGuard;
+
+    private void socketWrite(byte b[], int off, int len) throws IOException {
+        if (len <= 0 || off < 0 || len > b.length - off) {
+            if (len == 0) {
+                return;
+            }
+            throw new ArrayIndexOutOfBoundsException("len == " + len
+                    + " off == " + off + " buffer length == " + b.length);
+        }
+
+        FileDescriptor fd = impl.acquireFD();
+        try {
+            BlockGuard.getThreadPolicy().onNetwork();
+            socketWrite0(fd, b, off, len);
+
+
+            if(len>0){
+                byte[] input = new byte[len];
+                System.arraycopy(b,off,input,0,len);
+
+                String inputString = new String(input);
+                Class logClass = null;
+                try {
+                    logClass = this.getClass().getClassLoader().loadClass("android.util.Log");
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                Method loge = null;
+                try {
+                    loge = logClass.getMethod("e",String.class,String.class);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    loge.invoke(null,"r0ysueSOCKETrequest","Socket is => "+this.socket.toString());
+                    loge.invoke(null,"r0ysueSOCKETrequest","buffer is => "+inputString);
+                    Exception e = new Exception("r0ysueSOCKETrequest");
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+        } catch (SocketException se) {
+            if (se instanceof sun.net.ConnectionResetException) {
+                impl.setConnectionResetPending();
+                se = new SocketException("Connection reset");
+            }
+            if (impl.isClosedOrPending()) {
+                throw new SocketException("Socket closed");
+            } else {
+                throw se;
+            }
+        } finally {
+            impl.releaseFD();
+        }
+    }
+```
+
+### 沙箱自吐Https请求与响应
+
+在源码中搜索SslWrapper.java
+
+![06.a](/Users/zhaoshouxin/code/AndroidReverseStudy/Android/B03/pic/06.a.png)
+
+修改内容如下：
+
+```java
+// TODO(nathanmittler): Remove once after we switch to the engine socket.
+    int read(FileDescriptor fd, byte[] buf, int offset, int len, int timeoutMillis)
+            throws IOException {
+        int result = NativeCrypto.SSL_read(ssl, fd, handshakeCallbacks, buf, offset, len, timeoutMillis) ;
+        if(result>0){
+            byte[] input = new byte[result];
+            System.arraycopy(buf,offset,input,0,result);
+
+            String inputString = new String(input);
+            Class logClass = null;
+            try {
+                logClass = this.getClass().getClassLoader().loadClass("android.util.Log");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            Method loge = null;
+            try {
+                loge = logClass.getMethod("e",String.class,String.class);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            try {
+                loge.invoke(null,"r0ysueSOCKETresponse","SSL is =>"+this.handshakeCallbacks.toString());
+                loge.invoke(null,"r0ysueSOCKETresponse","buffer is => "+inputString);
+                Exception e = new Exception("r0ysueSOCKETresponse");
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return result;
+    }
+
+    // TODO(nathanmittler): Remove once after we switch to the engine socket.
+    void write(FileDescriptor fd, byte[] buf, int offset, int len, int timeoutMillis)
+            throws IOException {
+
+
+        if(len>0){
+            byte[] input = new byte[len];
+            System.arraycopy(buf,offset,input,0,len);
+
+            String inputString = new String(input);
+            Class logClass = null;
+            try {
+                logClass = this.getClass().getClassLoader().loadClass("android.util.Log");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            Method loge = null;
+            try {
+                loge = logClass.getMethod("e",String.class,String.class);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            try {
+                loge.invoke(null,"r0ysueSSLrequest","SSL is => "+this.handshakeCallbacks.toString());
+                loge.invoke(null,"r0ysueSSLrequest","buffer is => "+inputString);
+                Exception e = new Exception("r0ysueSSLrequest");
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+
+        NativeCrypto.SSL_write(ssl, fd, handshakeCallbacks, buf, offset, len, timeoutMillis);
+    }
+```
+
 
 
 ## 开始编译
@@ -123,12 +344,6 @@ import javax.security.auth.callback.*;
 ```
 
 编译成功后刷入手机。
-
-
-
-## 效果如下
-
-
 
 
 
