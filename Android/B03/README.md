@@ -251,7 +251,7 @@ import dalvik.system.BlockGuard;
 
 在源码中搜索SslWrapper.java
 
-![06.a](/Users/zhaoshouxin/code/AndroidReverseStudy/Android/B03/pic/06.a.png)
+![06.a](/Android/B03/pic/06.a.png)
 
 修改内容如下：
 
