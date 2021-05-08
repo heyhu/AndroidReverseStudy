@@ -67,6 +67,9 @@
 - 强制安装32位apk
   > adb install --abi armeabi-v7a  xxx.apk
 
+- 脱壳不全，想查看具体某一个类
+  > 使用frida_fart/dumpclass(classname)
+
 
 ### Tool
 
