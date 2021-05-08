@@ -70,6 +70,9 @@
 - 脱壳不全，想查看具体某一个类
   > 使用frida_fart/dumpclass(classname)
 
+- strings ***.so
+  > 查看so文件下的函数，可以使用grep过滤。｜grep -i java
+
 
 ### Tool
 
