@@ -1,13 +1,5 @@
 ## 1.1 **JNI介绍**
 
-  [以下提到的`源码`的地址](https://github.com/heyhu/demoso1)
-  
-  [Android ABI](https://developer.android.google.cn/ndk/guides/abis) 
-
-  [NDK与JNI基础](https://www.jianshu.com/p/87ce6f565d37)  
-
-  [ndk-samples ](https://github.com/android/ndk-samples)
-
 定义:  JNI，全称为Java Native Interface, 即Java本地接口, JNI是Java调用Native 语言的一种特性。`通过JNI可以使得Java与C/C++机型交互`。即可以在Java代码中调用C/C++等语言的代码或者在C/C++代码中调用Java代码, `由于JNI是JVM规范的一部分，因此可以将我们写的JNI的程序在任何实现了JNI规范的Java虚拟机中运行`, 同时这个特性使我们可以复用以前用C/C++写的大量代码JNI是一种在Java虚拟机机制下的执行代码的标准机制，`相当于java和c、c++中间的桥梁，JNI 大于NDK`，
 
 
@@ -306,3 +298,12 @@ ida中代码：
 }
 ```
 
+## 1.5 参考链接
+
+  > [以下提到的`源码`的地址](https://github.com/heyhu/demoso1)
+  > 
+  > [Android ABI](https://developer.android.google.cn/ndk/guides/abis) 
+  > 
+  > [NDK与JNI基础](https://www.jianshu.com/p/87ce6f565d37)  
+  > 
+  > [ndk-samples ](https://github.com/android/ndk-samples)
