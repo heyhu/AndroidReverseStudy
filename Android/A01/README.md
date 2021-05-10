@@ -300,7 +300,7 @@ ida中代码：
 
 ## 1.5 参考链接
 
-  > [以下提到的`源码`的地址](https://github.com/heyhu/demoso1)
+  > [以上提到的`源码`的地址](https://github.com/heyhu/demoso1)
   > 
   > [Android ABI](https://developer.android.google.cn/ndk/guides/abis) 
   > 
