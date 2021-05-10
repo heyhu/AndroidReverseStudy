@@ -1,6 +1,8 @@
 ## 1.1 **JNI介绍**
 
   [以下提到的`源码`的地址](https://github.com/heyhu/demoso1)
+  
+  [Android ABI](https://developer.android.google.cn/ndk/guides/abis) 
 
   [NDK与JNI基础](https://www.jianshu.com/p/87ce6f565d37)  
 
