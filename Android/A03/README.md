@@ -112,6 +112,38 @@
 
 
 
+### 1.1.3  指定32位
+
+```java
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
+
+    defaultConfig {
+        applicationId "com.heyhu.openso"
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+            // 现在基本32位
+            ndk {
+                abiFilters 'armeabi-v7a'
+            }
+
+        }
+    }
+```
+
+
+
+
+
 ## 1.2 llvm组件lldb
 
 llvm可以进行汇编、反汇编，机器码反汇编成16进制、指令集(disassemble)。llvm可以把C\C++代码编译成一个SO文件。
