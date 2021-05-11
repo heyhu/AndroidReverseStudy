@@ -32,6 +32,7 @@
 ## A.Native基础
 - [01.NDK入门开发](Android/A01/README.md)
 - [02.JNIEnv与反射](Android/A02/README.md)
+- [03.安卓so基本动态调试](Android/A03/README.md)
 
 ## B.安卓源码编译
 - [01.AOSP源码编译7.1.2_r8](Android/B01/README.md)
