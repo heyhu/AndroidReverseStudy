@@ -281,15 +281,15 @@ output：
 
 打开ida查看, f5跳到注册函数源代码中:
 
-![](pic/01.a.png)
+![](pic/01.png)
 
 选中函数名然后tab键验证和打印出的一样:
 
-<img src="pic/01.b.png" style="zoom:60%;" />
+<img src="pic/02.png" style="zoom:60%;" />
 
 空格键切换模式:
 
-![](pic/01.c.png)
+![](pic/03.png)
 
 
 
