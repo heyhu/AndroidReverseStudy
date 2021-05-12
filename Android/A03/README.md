@@ -110,6 +110,8 @@
 
 移植到代码中: [heyhu.c](https://github.com/heyhu/openso/blob/master/app/src/main/cpp/heyhu.c)
 
+Tips `如果安装后结果不对，可以删除/app/build/outputs/apk下的文件，修改成32位ABI即可`
+
 
 
 ### 1.1.3  指定32位
