@@ -78,7 +78,7 @@
 
 1. jnitrace：jni  
 2. frida-trace：libc
-3. Wallbreaker：内存漫游
+3. jeb、ghidra
 4. ZenTracer：批量hook  
 5. DEXDump/FART/Youpk：脱壳
 6. jadx 最新版支持多选dex文件
