@@ -87,6 +87,12 @@
 - strings ***.so
   
   > 查看so文件下的函数，可以使用grep过滤。｜grep -i java
+  
+- 查看目标app最顶层Activity
+
+  > adb shell dumpsys activity top ｜grep heyhu
+  >
+  > 进入调试模式：am start -D -n com.heyhu.openso/.MainActivity
 
 
 ### Tool

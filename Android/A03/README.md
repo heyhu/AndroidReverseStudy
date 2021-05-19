@@ -144,8 +144,6 @@ android {
 
 
 
-
-
 ## 1.2 llvm组件lldb
 
 llvm可以进行汇编、反汇编，机器码反汇编成16进制、指令集(disassemble)。llvm可以把C\C++代码编译成一个SO文件。
@@ -217,7 +215,107 @@ setImmediate(function(){
 
 
 
-## 1.4 参考链接
+## 1.4 HyperPwn调试入门
+
+### 1.4.1 app设置为可调式
+
+```
+CMakeLists.txt 最下面添加
+
+# gdb 调试
+SET(CMAKE_BUILD_TYPE "Debug")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+```
+
+```
+app下的build.gradle中android添加
+
+    packagingOptions{
+        doNotStrip "*/armeabi/*.so"
+        doNotStrip "*/armeabi-v7a/*.so"
+        doNotStrip "*/x86/*.so"
+    }
+```
+
+编译成功后，so文件会增加100k左右。
+
+
+
+### 1.4.2 环境搭建
+
+GDB 为C/S的调试架构:
+
+> 服务端地址为：`Android/sdk/ndk/22.0.7026061/prebuilt/android-arm/gdbserver`
+>
+> 客户端使用前人编译好的[Pwndocker](https://github.com/skysider/pwndocker)
+>
+> 进入docker后运行gdb-multiarch，要不然会报错。
+
+
+
+### 1.4.3 调试
+
+```
+$ 手机内启动64/32gdbserver: ./gdbserver 0.0.0.0:23946 --attach target_pip
+
+$ 端口转发: adb forward tcp:23946 tcp:23946
+
+$ docker内运行客户端gdb-multiarch，进入pwndbg
+
+$ 连接服务端target remote 手机ip:23946 
+
+$ pwndbg设置架构: set arch arm, set arm fallback-mode thumb 
+
+$ c（运行到下一个断点） r（继续运行） ctrl+c暂停  info share查看所有加载的so  
+
+$ nm -s so_name 查看所有符号
+
+$ 本地运行: nm -s so_name |grep method 查看 "*method*"方法地址或者使用objection、frida查看
+
+$ 查看该地址汇编: x/20i base_addr 
+	cat /proc/10700/maps |grep heyhu 基址为：d1241000
+	d1241000-d1247000 r-xp 00000000 103:13 917882
+
+$ b *(base_addr)设置断点  info b 查看断点 
+
+$ del 编号 删除断点
+
+$ 步入：f7 步进：f8
+
+$ finish 跳出方法  
+
+$ frida主动调用方法和pwndbg同时使用的话需要先启动frida附加（注入器注入之后ptracepid=0）然后再启动		gdbserver，在主动调用时候先用pwndbg暂停 然后frida 主动调用 然后f8就可以一步一步调试了
+
+$ objection查看so基址：memory list modules
+
+$ memory list exports so_name 查看so的所有符号基址
+
+$ 下两个断点切换状态 ctrl+shift+pageup
+
+$ frida和gdb为什么不能一起调试？
+		其中一个程序attach目标进程时，TracerPid会被占用，别的进程就附加不上。
+		cat /proc/10700/status   TracerPid:	25096   -> gdb
+ 		
+$ 为什么frida先附加后，gdb可以进行调试？
+ 		谁进行调试 TracerPid就是谁的进程，frida注入后 TracerPid为0，因为注入器注入后就dettch了，然后就可以用gdb了。
+```
+
+
+
+### 1.4.4 判断app使用的架构
+
+```
+Objection：Process Architecture arm
+
+查看目标进程的父进程
+root 3316 1 4213072 48928 poll_schedule_timeout 7135b2b518 S zygote64
+root 3317 1 1552068 40104 poll_schedule_timeout e72ebc4c S zygote
+```
+
+
+
+## 1.5 参考链接
 
 https://developer.android.google.cn/ndk/guides/other_build_systems
 
@@ -228,3 +326,13 @@ https://blog.csdn.net/wangyiyungw/article/details/81069631
 https://github.com/heyhu/openso
 
 https://lldb.llvm.org/use/map.html
+
+---
+
+https://github.com/skysider/pwndocker
+
+https://www.cnblogs.com/zhwer/p/12494317.html
+
+https://bbs.pediy.com/thread-257344.htm
+
+https://blog.csdn.net/l460133921/article/details/52931328/
