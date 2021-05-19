@@ -285,7 +285,7 @@ $ 步入：f7 步进：f8
 
 $ finish 跳出方法  
 
-$ frida主动调用方法和pwndbg同时使用的话需要先启动frida附加（注入器注入之后ptracepid=0）然后再启动		gdbserver，在主动调用时候先用pwndbg暂停 然后frida 主动调用 然后f8就可以一步一步调试了
+$ frida主动调用方法和pwndbg同时使用的话需要先启动frida附加（注入器注入之后ptracepid=0）然后再启动gdbserver，在主动调用时候先用pwndbg暂停 然后frida 主动调用 然后f8就可以一步一步调试了
 
 $ objection查看so基址：memory list modules
 
