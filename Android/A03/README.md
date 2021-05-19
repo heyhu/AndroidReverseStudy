@@ -274,8 +274,8 @@ $ nm -s so_name 查看所有符号
 $ 本地运行: nm -s so_name |grep method 查看 "*method*"方法地址或者使用objection、frida查看
 
 $ 查看该地址汇编: x/20i base_addr 
-	cat /proc/10700/maps |grep heyhu 基址为：d1241000
-	d1241000-d1247000 r-xp 00000000 103:13 917882
+   cat /proc/10700/maps |grep heyhu 基址为：d1241000
+   d1241000-d1247000 r-xp 00000000 103:13 917882
 
 $ b *(base_addr)设置断点  info b 查看断点 
 
@@ -295,11 +295,11 @@ $ memory list exports so_name 查看so的所有符号基址
 $ 下两个断点切换状态 ctrl+shift+pageup
 
 $ frida和gdb为什么不能一起调试？
-  其中一个程序attach目标进程时，TracerPid会被占用，别的进程就附加不上。
-  cat /proc/10700/status   TracerPid:	25096   -> gdb
+   其中一个程序attach目标进程时，TracerPid会被占用，别的进程就附加不上。
+   cat /proc/10700/status   TracerPid:	25096   -> gdb
  		
 $ 为什么frida先附加后，gdb可以进行调试？
-  谁进行调试 TracerPid就是谁的进程，frida注入后 TracerPid为0，因为注入器注入后就dettch了，然后就可以用gdb了。
+   谁进行调试 TracerPid就是谁的进程，frida注入后 TracerPid为0，因为注入器注入后就dettch了，然后就可以用gdb了。
 ```
 
 
