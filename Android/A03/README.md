@@ -295,11 +295,11 @@ $ memory list exports so_name 查看so的所有符号基址
 $ 下两个断点切换状态 ctrl+shift+pageup
 
 $ frida和gdb为什么不能一起调试？
-		其中一个程序attach目标进程时，TracerPid会被占用，别的进程就附加不上。
-		cat /proc/10700/status   TracerPid:	25096   -> gdb
+  其中一个程序attach目标进程时，TracerPid会被占用，别的进程就附加不上。
+  cat /proc/10700/status   TracerPid:	25096   -> gdb
  		
 $ 为什么frida先附加后，gdb可以进行调试？
- 		谁进行调试 TracerPid就是谁的进程，frida注入后 TracerPid为0，因为注入器注入后就dettch了，然后就可以用gdb了。
+  谁进行调试 TracerPid就是谁的进程，frida注入后 TracerPid为0，因为注入器注入后就dettch了，然后就可以用gdb了。
 ```
 
 
