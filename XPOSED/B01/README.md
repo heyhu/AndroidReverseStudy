@@ -7,12 +7,12 @@
 
 - [Hook 案例toastMessage方法](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/HookMessage.java) 
 
-    1. hook指定目标函数加载 前/后以及执行顺序
-    2. 参数/返回值打印 
-    3. 参数/返回值替换 
-    4. 调用栈打印  
-    5. 通过param.thisObject 来获取实例
-    6. 获取类的两种方法: 
+    > 1. hook指定目标函数加载 前/后以及执行顺序
+    > 2. 参数/返回值打印 
+    > 3. 参数/返回值替换 
+    > 4. 调用栈打印  
+    > 5. 通过param.thisObject 来获取实例
+    > 6. 获取类的两种方法: 
 
     ```
        1. XposedHelpers.findClass
@@ -21,49 +21,49 @@
 
 - [Hook XposedBridge hookAllMethods方法](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookAllMethod.java)  
 
-    1. 使用hookAllMethods Hook住指定方法 
-    2. 通过hook类的实例方法获得类的实例   
-    3. 主动调用动态方法
+    > 1. 使用hookAllMethods Hook住指定方法 
+    > 2. 通过hook类的实例方法获得类的实例   
+    > 3. 主动调用动态方法
 
 - [Hook 带壳App](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookApplication.java)  
     xpose 不能直接hook到带壳app下的类。
 
-    1. Hook壳原理 
-    2. Hook到目标类 
+    > 1. Hook壳原理 
+    > 2. Hook到目标类 
 
 - [Hook 构造方法](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookApplication.java)  
 
-    1. Hook构造方法并挂钩 
-    2. 获取实例 
-    3. 返回给定对象实例中对象字段的值  
+    > 1. Hook构造方法并挂钩 
+    > 2. 获取实例 
+    > 3. 返回给定对象实例中对象字段的值  
 
 - [复现XposedHelpers中某些方法](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookHelpers.java)   
-    
-    1. callMethod   
-    2. getObjectField   
-    3. getStaticIntField    
+
+    > 1. callMethod   
+    > 2. getObjectField   
+    > 3. getStaticIntField    
 
 - [复现loadPackageParam的属性](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookLp.java)    
     
-- 1. 过滤系统版本
-    2. 打印进程名  
-    3. 打印包名    
-    4. 获取ClassLoader,用于查找包名等。   
-    
+    > 1. 过滤系统版本
+    > 2. 打印进程名  
+    > 3. 打印包名    
+    > 4. 获取ClassLoader,用于查找包名等。 
+
 - [Hook 多dex apk](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookMoreDex.java)    
    
-- 1. hook 多dex问题   
-   2. findAndHookMethod可以指定参数类型指定hook特定的重载方法    
-   
+   > 1. hook 多dex问题   
+   > 2. findAndHookMethod可以指定参数类型指定hook特定的重载方法    
+
 - [主动调用内存爆破](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookVerifier.java)      
-  
-  1.  XposedHelpers.callStaticMethod 主动调用    
-  2. 反射主动调用 
-  3. context构造  
-  
+
+  > 1.  XposedHelpers.callStaticMethod 主动调用    
+  > 2. 反射主动调用 
+  > 3. context构造  
+
 - [NanoHttpd 算法主动暴露](https://github.com/heyhu/xposeProject/blob/main/app/src/main/java/com/example/xposed1/practice/HookVerifier.java)   
 
-   1. 使用http服务暴露算法   
+   > 1. 使用http服务暴露算法   
 
 - 获取实例的三种方式
    1. Hook一个实例方法来获取实例
