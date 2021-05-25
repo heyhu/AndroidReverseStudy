@@ -1,9 +1,6 @@
 # AndroidReverseStudy
 安卓逆向学习
 
-`致谢`    
-##### `r0ysue`的知识星球。   
-![](FRIDA/A01/pic/02.a.png)
 ---
 
 # 《FRIDA系列》
