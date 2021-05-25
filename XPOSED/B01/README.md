@@ -83,7 +83,8 @@
 
    > $ 使用http服务暴露算法   
 
-- 获取实例的三种方式
+- 获取实例的三种方式 
+
    $ Hook一个实例方法来获取实例
 
    $ 获取构造方法来获取实例
@@ -108,5 +109,6 @@
 
 - 构造函数解释    
   ![](pic/02.a.png)         
-   java初始化设置属性的时候，是用构造函数来设置的。new DemoHelper("123") 给类传参数。
-   XposedHelpers.findConstructorExact(CLASS_SHOW_STACK_ACTION_BUTTON_EVENT, cl, boolean.class).newInstance(true));
+  
+- > java初始化设置属性的时候，是用构造函数来设置的。new DemoHelper("123") 给类传参数。
+  >  XposedHelpers.findConstructorExact(CLASS_SHOW_STACK_ACTION_BUTTON_EVENT, cl, boolean.class).newInstance(true));
