@@ -110,5 +110,5 @@
 - 构造函数解释    
   ![](pic/02.a.png)         
   
-- > java初始化设置属性的时候，是用构造函数来设置的。new DemoHelper("123") 给类传参数。
+  > java初始化设置属性的时候，是用构造函数来设置的。new DemoHelper("123") 给类传参数。
   >  XposedHelpers.findConstructorExact(CLASS_SHOW_STACK_ACTION_BUTTON_EVENT, cl, boolean.class).newInstance(true));
