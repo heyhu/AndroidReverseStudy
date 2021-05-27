@@ -3,6 +3,12 @@
 
 ---
 
+`致谢`
+
+ `r0ysue`的知识星球
+
+---
+
 # 《FRIDA系列》
 ## A.配置与使用  
 - [01.FRIDA](FRIDA/A01/README.md)
