@@ -59,7 +59,7 @@ TracePid fgets 反调试
 
 
 
-### 1.1.3 硬编码修改反调试
+### 1.1.3 修改硬编码破解反调试
 
 idaNew打开so文件，找到判断的地方，因为是和'reject'做对比检测，找到reject。
 
@@ -73,7 +73,19 @@ idaNew打开so文件，找到判断的地方，因为是和'reject'做对比检�
 
 objection hook住app，找到native-lib.so(代码所在的so库，不一定是native-lib.so)所在的地址，使用adb shell 进入地址，找到对应so文件。把修改后的so文件push到原native-lib.so所在的地址，替换之前的so文件。
 
-直接保存so文件，运行app，修改后的代码是不生效的，需要找到要修改的so库的所在地址，删除原文件，修改后的so文件重新push进去。
+直接保存so文件，运行app，修改后的代码是不生效的，需要找到要修改的so库的所在地址，删除原文件，修改后的so文件重新push进去。或者使用apktool重打包，[签名工具](https://github.com/patrickfav/uber-apk-signer)。
 
 **总结**：需要动静态分析。可以把它用来检测、匹配的特征 全部硬编码替换掉，只要程序正常运行。
+
+
+
+## 1.2 参考链接
+
+知识星球搜索反调试
+
+https://www.rapidtables.com/convert/number/hex-to-ascii.html
+
+https://github.com/patrickfav/uber-apk-signer
+
+https://mp.weixin.qq.com/s/xlgtU4xqoMqv2oXCMko7yQ
 
