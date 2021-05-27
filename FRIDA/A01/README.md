@@ -39,3 +39,4 @@
    ![](pic/04.a.png)
    
 10. 如果某些app检测frida的话可以用[hluda](https://github.com/hluwa/strongR-frida-android)
+11. frida-ps -Ua 查看后台进程
