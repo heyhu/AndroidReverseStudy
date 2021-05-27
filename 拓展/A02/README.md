@@ -55,19 +55,19 @@ JNIEXPORT void JNICALL Java_sg_vantagepoint_antifrida_MainActivity_init(JNIEnv *
 
 TracePid fgets 反调试
 
-![](/pic/01.a.png)
+![](pic/01.a.png)
 
 ### 1.1.3 修改硬编码破解反调试
 
 idaNew打开so文件，找到判断的地方，因为是和'reject'做对比检测，找到reject。
 
-![](/pic/01.b.png)
+![](pic/01.b.png)
 
 选中, 进入hex view，把硬编码修改, 右键选择edit, 43和54任意修改，reject变成别的字就可以，可以使用[hex to ascii](https://www.rapidtables.com/convert/number/hex-to-ascii.html)查看，右键选择 apply changes保存。
 
 全局修改：edit-> patch program -> apply patches to input file 保存。(同时保存备份文件，用md5对修改前、修改后两个so文件做对比，看是否修改保存成功。)
 
-![](/pic/01.c.png)
+![](pic/01.c.png)
 
 objection hook住app，找到native-lib.so(代码所在的so库，不一定是native-lib.so)所在的地址，使用adb shell 进入地址，找到对应so文件。把修改后的so文件push到原native-lib.so所在的地址，替换之前的so文件。
 
