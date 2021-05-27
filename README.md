@@ -35,6 +35,7 @@
 - [01.AOSP源码编译7.1.2_r8](Android/B01/README.md)
 - [02.AOSP源码修改-制作简易沙箱](Android/B02/README.md)
 - [03.AOSP源码修改-自制沙箱进行无感知抓包](Android/B03/README.md)
+- [04.刷机](Android/B04/README.md)
 
 ---
 
