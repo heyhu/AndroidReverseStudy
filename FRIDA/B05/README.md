@@ -281,13 +281,49 @@ print(flag)
 
 
 
+## 1.2 Keypatch硬改算法逻辑
+
+```
+    while ( *(unsigned __int8 *)(v12 + v24) == *((unsigned __int8 *)&v29 + v24) )
+    {
+      if ( *(_BYTE *)(v12 + v24) )
+      {
+        if ( ++v24 != 41 )
+          continue;
+      }
+      v28 = 1;
+      goto LABEL_9;
+    }
+    v28 = 0;
+LABEL_9:
+    result = free();
+  }
+  else
+  {
+    v28 = 0;
+  }
+  if ( *(_QWORD *)(v3 + 40) == v43 )
+    result = v28;
+  return result;
+```
+
+使用Keypatch让v28等于1,输入任何都能成功。点击v28，显示其寄存器为w19，tab切换汇编。
+
+![](pic/09.a.png)
+
+选中w19，edit -> plugins -> keypunch patcher ,让w19 一直等于1，然后apply patches to input file 全局替换。
+
+替换源so文件就可以了。
+
+![](pic/10.a.png)
+
+
+
 ## 1.3 参考链接
 
 https://www.jianshu.com/p/d2d28920940c
 
 https://blog.csdn.net/hbhgyu/article/details/81321923
-
-
 
 https://www.52pojie.cn/thread-1369661-1-1.html
 
