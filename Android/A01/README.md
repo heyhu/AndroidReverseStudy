@@ -307,3 +307,5 @@ ida中代码：
   > [NDK与JNI基础](https://www.jianshu.com/p/87ce6f565d37)  
   > 
   > [ndk-samples ](https://github.com/android/ndk-samples)
+  > 
+  > [frida_env.js](https://github.com/frida/frida-java-bridge/blob/master/lib/env.js)
