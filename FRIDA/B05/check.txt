@@ -1,0 +1,137 @@
+__int64 __fastcall Java_cn_pojie52_cm01_MainActivity_check(__int64 a1, __int64 a2, __int64 a3)
+{
+  unsigned __int64 v3; // x22
+  __int64 v4; // x19
+  __int64 v5; // x20
+  __int64 result; // x0
+  __int64 v7; // x21
+  __int64 v8; // x0
+  __int64 v9; // x0
+  __int64 v10; // x0
+  __int64 v11; // x0
+  int8x16_t v12; // q0
+  int8x16_t v13; // q4
+  int8x16_t v14; // q2
+  int8x16_t v15; // q5
+  int8x16_t v16; // q1
+  unsigned int v17; // w10
+  unsigned int v18; // w10
+  int8x16_t v19; // q0
+  unsigned int v20; // w10
+  unsigned int v21; // w10
+  unsigned int v22; // w10
+  __int64 v23; // x8
+  unsigned int v24; // w10
+  unsigned int v25; // w10
+  unsigned int v26; // w10
+  unsigned int v27; // w19
+  __int128 v28; // [xsp+0h] [xbp-A0h]
+  __int128 v29; // [xsp+10h] [xbp-90h]
+  char v30; // [xsp+21h] [xbp-7Fh]
+  unsigned __int8 v31; // [xsp+22h] [xbp-7Eh]
+  unsigned __int8 v32; // [xsp+23h] [xbp-7Dh]
+  unsigned __int8 v33; // [xsp+24h] [xbp-7Ch]
+  char v34; // [xsp+25h] [xbp-7Bh]
+  unsigned __int8 v35; // [xsp+26h] [xbp-7Ah]
+  char v36; // [xsp+27h] [xbp-79h]
+  char v37; // [xsp+28h] [xbp-78h]
+  __int128 v38; // [xsp+38h] [xbp-68h]
+  __int128 v39; // [xsp+48h] [xbp-58h]
+  __int128 v40; // [xsp+58h] [xbp-48h]
+  __int128 v41; // [xsp+68h] [xbp-38h]
+  __int64 v42; // [xsp+78h] [xbp-28h]
+
+  v3 = _ReadStatusReg(ARM64_SYSREG(3, 3, 13, 0, 2));
+  v4 = a1;
+  v5 = a3;
+  v42 = *(_QWORD *)(v3 + 40);
+  result = (*(__int64 (**)(void))(*(_QWORD *)a1 + 1344LL))();
+  if ( (_DWORD)result == 30 )
+  {
+    v7 = (*(__int64 (__fastcall **)(__int64, __int64, _QWORD))(*(_QWORD *)v4 + 1352LL))(v4, v5, 0LL);
+    v41 = 0u;
+    v40 = 0u;
+    v39 = 0u;
+    v38 = 0u;
+    v8 = ((__int64 (*)(void))strlen)();
+    strncpy(&v38, v7, v8);
+    (*(void (__fastcall **)(__int64, __int64, __int64))(*(_QWORD *)v4 + 1360LL))(v4, v5, v7);
+    v9 = strlen(&v38);
+    sub_B90(&v38, v9, "areyousure??????");
+    v10 = strlen(&v38);
+    v11 = sub_D90(&v38, v10);
+    v28 = unk_11A1;
+    v29 = unk_11B1;
+    *(__int128 *)((char *)&v29 + 9) = unk_11BA;
+    v12.n128_u64[0] = -5570193308531903822LL;
+    v12.n128_u64[1] = -5570193308531903822LL;
+    v13.n128_u64[0] = -72340172838076674LL;
+    v13.n128_u64[1] = -72340172838076674LL;
+    LOBYTE(v28) = 53;
+    v14 = veorq_s8(
+            vaddq_s8(
+              veorq_s8(vaddq_s8(*(int8x16_t *)((char *)&v28 + 1), v12), (int8x16_t)xmmword_1130),
+              (int8x16_t)xmmword_1140),
+            v13);
+    v15.n128_u64[0] = 72340172838076673LL;
+    v15.n128_u64[1] = 72340172838076673LL;
+    v16.n128_u64[0] = 4485090715960753726LL;
+    v16.n128_u64[1] = 4485090715960753726LL;
+    *(__int128 *)((char *)&v28 + 1) = (__int128)vaddq_s8(
+                                                  veorq_s8(
+                                                    vsubq_s8(
+                                                      v15,
+                                                      vorrq_s8(vshrq_n_u8(v14, 7uLL), vshlq_n_s8(v14, 1uLL))),
+                                                    (int8x16_t)xmmword_1150),
+                                                  v16);
+    v17 = (((unk_11C2 - 78) ^ 0xFFFFFFB6) - 113) ^ 0xFFFFFFFE;
+    v30 = ((1 - (2 * v17 & 0xFE | (v17 >> 7) & 1)) ^ 0x21) + 62;
+    v18 = (((v31 - 78) ^ 0xFFFFFFB5) - 114) ^ 0xFFFFFFFE;
+    v31 = ((1 - (2 * v18 & 0xFE | (v18 >> 7) & 1)) ^ 0x22) + 62;
+    v19 = veorq_s8(
+            vaddq_s8(
+              veorq_s8(vaddq_s8(*(int8x16_t *)((char *)&v29 + 1), v12), (int8x16_t)xmmword_1160),
+              (int8x16_t)xmmword_1170),
+            v13);
+    v20 = (((v32 - 78) ^ 0xFFFFFFB4) - 115) ^ 0xFFFFFFFE;
+    v32 = ((1 - (2 * v20 & 0xFE | (v20 >> 7) & 1)) ^ 0x23) + 62;
+    v21 = (((v33 - 78) ^ 0xFFFFFFB3) - 116) ^ 0xFFFFFFFE;
+    v33 = ((1 - (2 * v21 & 0xFE | (v21 >> 7) & 1)) ^ 0x24) + 62;
+    v22 = (((unk_11C6 - 78) ^ 0xFFFFFFB2) - 117) ^ 0xFFFFFFFE;
+    v34 = ((1 - (2 * v22 & 0xFE | (v22 >> 7) & 1)) ^ 0x25) + 62;
+    v23 = 0LL;
+    v24 = (((v35 - 78) ^ 0xFFFFFFB1) - 118) ^ 0xFFFFFFFE;
+    v35 = ((1 - (2 * v24 & 0xFE | (v24 >> 7) & 1)) ^ 0x26) + 62;
+    *(__int128 *)((char *)&v29 + 1) = (__int128)vaddq_s8(
+                                                  veorq_s8(
+                                                    vsubq_s8(
+                                                      v15,
+                                                      vorrq_s8(vshrq_n_u8(v19, 7uLL), vshlq_n_s8(v19, 1uLL))),
+                                                    (int8x16_t)xmmword_1180),
+                                                  v16);
+    v25 = (((unk_11C8 - 78) ^ 0xFFFFFFB0) - 119) ^ 0xFFFFFFFE;
+    v36 = ((1 - (2 * v25 & 0xFE | (v25 >> 7) & 1)) ^ 0x27) + 62;
+    v26 = (((unk_11C9 - 78) ^ 0xFFFFFFBF) - 120) ^ 0xFFFFFFFE;
+    v37 = ((1 - (2 * v26 & 0xFE | (v26 >> 7) & 1)) ^ 0x28) + 62;
+    while ( *(unsigned __int8 *)(v11 + v23) == *((unsigned __int8 *)&v28 + v23) )
+    {
+      if ( *(_BYTE *)(v11 + v23) )
+      {
+        if ( ++v23 != 41 )
+          continue;
+      }
+      v27 = 1;
+      goto LABEL_9;
+    }
+    v27 = 0;
+LABEL_9:
+    result = free();
+  }
+  else
+  {
+    v27 = 1;
+  }
+  if ( *(_QWORD *)(v3 + 40) == v42 )
+    result = v27;
+  return result;
+}

@@ -1,0 +1,103 @@
+unsigned __int64 __fastcall sub_B90(_BYTE *a1, unsigned int a2, __int64 a3)
+{
+  unsigned __int64 v3; // x22
+  _BYTE *v4; // x19
+  __int64 v5; // x21
+  unsigned int v6; // w20
+  unsigned __int64 result; // x0
+  unsigned __int64 v8; // x8
+  signed int v9; // w9
+  int v10; // w11
+  int v11; // w9
+  int v12; // w12
+  signed int v13; // w9
+  signed int v14; // w11
+  __int64 v15; // x8
+  int v16; // w12
+  int v17; // w9
+  int v18; // w13
+  int v19; // w11
+  int v20; // w14
+  __int128 v21; // [xsp+0h] [xbp-140h]
+  __int128 v22; // [xsp+10h] [xbp-130h]
+  __int128 v23; // [xsp+20h] [xbp-120h]
+  __int128 v24; // [xsp+30h] [xbp-110h]
+  __int128 v25; // [xsp+40h] [xbp-100h]
+  __int128 v26; // [xsp+50h] [xbp-F0h]
+  __int128 v27; // [xsp+60h] [xbp-E0h]
+  __int128 v28; // [xsp+70h] [xbp-D0h]
+  __int128 v29; // [xsp+80h] [xbp-C0h]
+  __int128 v30; // [xsp+90h] [xbp-B0h]
+  __int128 v31; // [xsp+A0h] [xbp-A0h]
+  __int128 v32; // [xsp+B0h] [xbp-90h]
+  __int128 v33; // [xsp+C0h] [xbp-80h]
+  __int128 v34; // [xsp+D0h] [xbp-70h]
+  __int128 v35; // [xsp+E0h] [xbp-60h]
+  __int128 v36; // [xsp+F0h] [xbp-50h]
+  __int64 v37; // [xsp+108h] [xbp-38h]
+
+  v3 = _ReadStatusReg(ARM64_SYSREG(3, 3, 13, 0, 2));
+  v4 = a1;
+  v5 = a3;
+  v6 = a2;
+  v37 = *(_QWORD *)(v3 + 40);
+  result = strlen(a3);
+  v21 = xmmword_11D0;
+  v22 = xmmword_11E0;
+  v23 = xmmword_11F0;
+  v24 = xmmword_1200;
+  v25 = xmmword_1210;
+  v26 = xmmword_1220;
+  v27 = xmmword_1230;
+  v28 = xmmword_1240;
+  v29 = xmmword_1250;
+  v30 = xmmword_1260;
+  v31 = xmmword_1270;
+  v32 = xmmword_1280;
+  v8 = 0LL;
+  v9 = 0;
+  v33 = xmmword_1290;
+  v34 = xmmword_12A0;
+  v35 = xmmword_12B0;
+  v36 = xmmword_12C0;
+  do
+  {
+    v10 = *((unsigned __int8 *)&v21 + v8);
+    v11 = v9 + v10 + *(unsigned __int8 *)(v5 + v8 - v8 / result * result);
+    v12 = v11 + 255;
+    if ( v11 >= 0 )
+      v12 = v11;
+    v9 = v11 - (v12 & 0xFFFFFF00);
+    *((_BYTE *)&v21 + v8++) = *((_BYTE *)&v21 + v9);
+    *((_BYTE *)&v21 + v9) = v10;
+  }
+  while ( v8 != 256 );
+  if ( v6 )
+  {
+    v13 = 0;
+    v14 = 0;
+    v15 = v6;
+    do
+    {
+      v16 = v13 + 1;
+      if ( v13 + 1 >= 0 )
+        v17 = v13 + 1;
+      else
+        v17 = v13 + 256;
+      v13 = v16 - (v17 & 0xFFFFFF00);
+      v18 = *((unsigned __int8 *)&v21 + v13);
+      v19 = v14 + v18;
+      v20 = v19 + 255;
+      if ( v19 >= 0 )
+        v20 = v19;
+      v14 = v19 - (v20 & 0xFFFFFF00);
+      --v15;
+      *((_BYTE *)&v21 + v13) = *((_BYTE *)&v21 + v14);
+      *((_BYTE *)&v21 + v14) = v18;
+      *v4++ ^= *((_BYTE *)&v21 + (unsigned __int8)(*((_BYTE *)&v21 + v13) + v18));
+    }
+    while ( v15 );
+  }
+  *(_QWORD *)(v3 + 40);
+  return result;
+}
