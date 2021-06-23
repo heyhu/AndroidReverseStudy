@@ -94,6 +94,9 @@
   >
   > 进入调试模式：am start -D -n com.heyhu.openso/.MainActivity
 
+- jadx 反编译失败，代码中含有smali代码
+  > jadx-gui --show-bad-code test.apk
+
 
 ### Tool
 
