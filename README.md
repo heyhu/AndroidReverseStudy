@@ -13,6 +13,7 @@
 ## A.配置与使用  
 - [01.FRIDA](FRIDA/A01/README.md)
 - [02.Objection](FRIDA/A02/README.md)
+- [03.Tips](FRIDA/A03/README.md)
 
 ## B.FRIDA API篇
 - [01.Hook Java](FRIDA/B01/README.md)
@@ -44,9 +45,3 @@
 - [02.AOSP源码修改-制作简易沙箱](Android/B02/README.md)
 - [03.AOSP源码修改-自制沙箱进行无感知抓包](Android/B03/README.md)
 - [04.刷机](Android/B04/README.md)
-
----
-
-# 《拓展》
-- [01.Tips](拓展/A01/README.md)
-
