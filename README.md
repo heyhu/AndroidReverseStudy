@@ -37,6 +37,7 @@
 - [01.NDK入门开发](Android/A01/README.md)
 - [02.JNIEnv与反射](Android/A02/README.md)
 - [03.安卓so基本动态调试](Android/A03/README.md)
+- [04.IDA修改硬编码过Frida反调试](Android/A04/README.md)
 
 ## B.安卓源码编译
 - [01.AOSP源码编译7.1.2_r8](Android/B01/README.md)
@@ -48,5 +49,4 @@
 
 # 《拓展》
 - [01.Tips](拓展/A01/README.md)
-- [02.IDA修改硬编码过Frida反调试](拓展/A02/README.md)
 
