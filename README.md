@@ -38,10 +38,15 @@
 - [01.NDK入门开发](Android/A01/README.md)
 - [02.JNIEnv与反射](Android/A02/README.md)
 - [03.安卓so基本动态调试](Android/A03/README.md)
-- [04.IDA修改硬编码过Frida反调试](Android/A04/README.md)
 
 ## B.安卓源码编译
 - [01.AOSP源码编译7.1.2_r8](Android/B01/README.md)
 - [02.AOSP源码修改-制作简易沙箱](Android/B02/README.md)
 - [03.AOSP源码修改-自制沙箱进行无感知抓包](Android/B03/README.md)
 - [04.刷机](Android/B04/README.md)
+
+## C.工具篇
+
+- [01.IDA常用快捷键](Android/C01/README.md)
+- [02.IDA修改硬编码过Frida反调试](Android/C02/README.md)
+

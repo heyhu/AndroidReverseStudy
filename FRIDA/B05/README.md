@@ -59,25 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
 打开首先点击exports，查看导出函数，可以看到函数名`Java_cn_pojie52_cm01_MainActivity_check`，此函数是一个JNI的静态注册的函数，点击F5，查看c伪代码。
 
-一些IDA的常用快捷键：
-
-```
-$ shift + F12：查看so文件中所有常量字符串的值；
-$ tab键：汇编和伪 C 代码之间相互切换；
-$ / 键：添加注释；
-$ N 键：变量重命名；
-$ X 键：查看某变量的所有引用；
-$ = 键：消除冗余的中间变量；
-$ 由于 IDA 反编译出来总是会有很多冗余的中间变量，如：
-	v2 = v1; result = encrypt(v2); 选中 v2，按键盘上的 = 键，再点击 OK，即可消除中间变量 v2：
-	result = encrypt(v1)；
-$ 在汇编查看图谱引用: 汇编代码 xrefs graph from；
-$ Options -> General -> Number of opcode bytes -> 4 查看地址
-$ 当某函数没有出现代码，全是16进制时，在那串上按C，然后按P转成函数，然后可以F5了,按`c`把数据转为代码，按P是强转为function， 这样才能F5，f5为强转；
-$ c代码函数右击 出现fource call type ：IDA识别的不准确，一般在jni函数上用，就是把函数的参数啥的修正了，让函数变正常；
-$ ida c变量星花类型hook 前面加ptr
-```
-
 F5查看伪代码，第一行：
 
 `__int64 __fastcall Java_cn_pojie52_cm01_MainActivity_check(JNIEnv *a1, __int64 a2, __int64 a3)`
