@@ -25,11 +25,14 @@
 ---
 
 # 《XPOSED系列》
-## A.配置与使用 
-- [01.XPOSED配置](https://www.freebuf.com/articles/terminal/189021.html)
+## A.Xposed API篇
+- [01.Xposed配置](https://www.freebuf.com/articles/terminal/189021.html)
+- [02.Xposed API 实例讲解](XPOSED/A01/README.md)
 
-## B.Xposed API篇
-- [01.Xposed API 实例讲解](XPOSED/B01/README.md)
+## B.Xposed 魔改篇
+
+- [01.刷入官方Xposed](https://mp.weixin.qq.com/s/c97zoTxRrEeYLvD8YwIUVQ)
+- [02.Xposed魔改](https://mp.weixin.qq.com/s/YAMCrQSi0LFJGNIwB9qHDA)
 
 ---
 
