@@ -107,3 +107,4 @@
 5. DEXDump/FART/Youpk：脱壳
 6. jadx 最新版支持多选dex文件
 7. [Hook Event](https://github.com/heyhu/frida-agent-example/blob/master/code/tools/hookEvent.js)
+8. inspeckage
