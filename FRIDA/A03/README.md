@@ -106,5 +106,5 @@
 4. ZenTracer：批量hook  
 5. DEXDump/FART/Youpk：脱壳
 6. jadx 最新版支持多选dex文件
-7. [Hook Event](https://github.com/heyhu/frida-agent-example/blob/master/code/tools/hookEvent.js)
+7. [Hook Event](https://github.com/heyhu/frida-agent-example/blob/master/code/tools/hook_event.js)
 8. inspeckage
