@@ -165,14 +165,12 @@ v11 = v10 + __ROR4__((v8 & ~v10 | v9 & v10) + v76 + v7 + 1200080426, 20);
       D64 = 2E55BB7C
 	5. 与原始相加做级联
      与原始相加舍最高位 
-     a = D296E7E0 + 0x67452301 = 39dc0ae1
-     b = BB8C0dc0 + 0xEFCDAB89 = ab59b949
-     c = BF2579C0 + 0x98BADCFE = 57e056be
-     d = 2E55BB7C + 0x10325476 = 3e880ff2
-
-   做级联
-    先端序转换
-    e10adc39 + 49b959ab + be56e057 + f20f883e
+       a = D296E7E0 + 0x67452301 = 39dc0ae1
+       b = BB8C0dc0 + 0xEFCDAB89 = ab59b949
+       c = BF2579C0 + 0x98BADCFE = 57e056be
+       d = 2E55BB7C + 0x10325476 = 3e880ff2
+   	 做级联,先端序转换
+      e10adc39 + 49b959ab + be56e057 + f20f883e
   
 ```
 
