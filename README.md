@@ -24,15 +24,17 @@
 
 ---
 
-# 《XPOSED系列》
-## A.Xposed API篇
+# 《逆向工具系列》
+## A.Xposed篇
 - [01.Xposed配置](https://www.freebuf.com/articles/terminal/189021.html)
-- [02.Xposed API 实例讲解](XPOSED/A01/README.md)
+- [02.Xposed API 实例讲解](Tool/XPOSED/A01/README.md)
+- [03.刷入官方Xposed](https://mp.weixin.qq.com/s/c97zoTxRrEeYLvD8YwIUVQ)
+- [04.Xposed魔改](https://mp.weixin.qq.com/s/YAMCrQSi0LFJGNIwB9qHDA)
 
-## B.Xposed 魔改篇
+## B.IDA篇
 
-- [01.刷入官方Xposed](https://mp.weixin.qq.com/s/c97zoTxRrEeYLvD8YwIUVQ)
-- [02.Xposed魔改](https://mp.weixin.qq.com/s/YAMCrQSi0LFJGNIwB9qHDA)
+- [01.IDA常用快捷键](Tool/IDA/A01/README.md)
+- [02.IDA修改硬编码过Frida反调试](Tool/IDA/A02/README.md)
 
 ---
 
@@ -48,9 +50,3 @@
 - [02.AOSP源码修改-制作简易沙箱](Android/B02/README.md)
 - [03.AOSP源码修改-自制沙箱进行无感知抓包](Android/B03/README.md)
 - [04.刷机](Android/B04/README.md)
-
-## C.工具篇
-
-- [01.IDA常用快捷键](Android/C01/README.md)
-- [02.IDA修改硬编码过Frida反调试](Android/C02/README.md)
-
