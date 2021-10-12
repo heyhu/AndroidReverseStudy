@@ -48,7 +48,7 @@
 
 搜索加密算法
 
-> findcrypt、IDASignsrch、findhash、IDAscope
+> findcrypt(静态识别率低)、IDASignsrch(静态识别率低)、findhash、IDAscope
 
 插件编写
 
