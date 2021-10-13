@@ -51,6 +51,8 @@ public class oasis extends AbstractJni{
 }
 ```
 
+
+
 ## 1.2 执行目标函数--参数构造
 
 - 字节数组需要裹上unidbg的包装类，并加到本地变量里，两件事缺一不可。
@@ -108,6 +110,95 @@ public class oasis extends AbstractJni{
         return result;
     };
 ```
+
+### 1.2.3 treemap
+
+```java
+    public void s(){
+        TreeMap<String, String> keymap = new TreeMap<String, String>();
+        keymap.put("appkey", "1d8b6e7d45233436");
+        keymap.put("autoplay_card", "11");
+        keymap.put("banner_hash", "10687342131252771522");
+        keymap.put("build", "6180500");
+        keymap.put("c_locale", "zh_CN");
+        keymap.put("channel", "shenma117");
+        keymap.put("column", "2");
+        keymap.put("device_name", "MIX2S");
+        keymap.put("device_type", "0");
+        keymap.put("flush", "6");
+        keymap.put("ts", "1612693177")
+    };
+
+```
+
+- 可以照着StringObject重新写一个，也可以不这么麻烦，直接返回一个“空壳”，Native中对treemap做了操作再补对应的方法，这样比较经济实惠。
+- 代码中补齐了treeMap的继承关系：map→AbstractMap→TreeMap，这么做是必要的，否则在有些情况下会报错，具体讨论此处略过。
+
+```java
+ public void s(){
+        List<Object> list = new ArrayList<>(10);
+        list.add(vm.getJNIEnv()); // 第一个参数是env
+        list.add(0); // 第二个参数，实例方法是jobject，静态方法是jclazz，直接填0，一般用不到。
+
+        TreeMap<String, String> keymap = new TreeMap<String, String>();
+        keymap.put("ad_extra", "E1133C23F36571A3F1FDE6B325B17419AAD45287455E5292A19CF51300EAF0F2664C808E2C407FBD9E50BD48F8ED17334F4E2D3A07153630BF62F10DC5E53C42E32274C6076A5593C23EE6587F453F57B8457654CB3DCE90FAE943E2AF5FFAE78E574D02B8BBDFE640AE98B8F0247EC0970D2FD46D84B958E877628A8E90F7181CC16DD22A41AE9E1C2B9CB993F33B65E0B287312E8351ADC4A9515123966ACF8031FF4440EC4C472C78C8B0C6C8D5EA9AB9E579966AD4B9D23F65C40661A73958130E4D71F564B27C4533C14335EA64DD6E28C29CD92D5A8037DCD04C8CCEAEBECCE10EAAE0FAC91C788ECD424D8473CAA67D424450431467491B34A1450A781F341ABB8073C68DBCCC9863F829457C74DBD89C7A867C8B619EBB21F313D3021007D23D3776DA083A7E09CBA5A9875944C745BB691971BFE943BD468138BD727BF861869A68EA274719D66276BD2C3BB57867F45B11D6B1A778E7051B317967F8A5EAF132607242B12C9020328C80A1BBBF28E2E228C8C7CDACD1F6CC7500A08BA24C4B9E4BC9B69E039216AA8B0566B0C50A07F65255CE38F92124CB91D1C1C39A3C5F7D50E57DCD25C6684A57E1F56489AE39BDBC5CFE13C540CA025C42A3F0F3DA9882F2A1D0B5B1B36F020935FD64D58A47EF83213949130B956F12DB92B0546DADC1B605D9A3ED242C8D7EF02433A6C8E3C402C669447A7F151866E66383172A8A846CE49ACE61AD00C1E42223");
+        keymap.put("appkey", "1d8b6e7d45233436");
+        keymap.put("autoplay_card", "11");
+        keymap.put("banner_hash", "10687342131252771522");
+        keymap.put("build", "6180500");
+        keymap.put("c_locale", "zh_CN");
+        keymap.put("channel", "shenma117");
+        keymap.put("column", "2");
+        keymap.put("device_name", "MIX2S");
+        keymap.put("device_type", "0");
+        keymap.put("flush", "6");
+        keymap.put("ts", "1612693177");
+   
+        DvmClass Map = vm.resolveClass("java/util/Map");
+        DvmClass AbstractMap = vm.resolveClass("java/util/AbstractMap",Map);
+        DvmObject<?> input_map = vm.resolveClass("java/util/TreeMap", AbstractMap).newObject(keymap);
+        list.add(vm.addLocalObject(input_map));
+        Number number = module.callFunction(emulator, 0x1c97, list.toArray())[0];
+        DvmObject result = vm.getObject(number.intValue());
+    };
+```
+
+### 1.2.4 对象数组
+
+```java
+public String main203(){
+        List<Object> list = new ArrayList<>(10);
+        list.add(vm.getJNIEnv());
+        list.add(0);
+        list.add(203);
+        StringObject input2_1 = new StringObject(vm, "9b69f861-e054-4bc4-9daf-d36ae205ed3e");
+        ByteArray input2_2 = new ByteArray(vm, "GET /aggroup/homepage/display __r0ysue".getBytes(StandardCharsets.UTF_8));
+        DvmInteger input2_3 = DvmInteger.valueOf(vm, 2);
+        vm.addLocalObject(input2_1);
+        vm.addLocalObject(input2_2);
+        vm.addLocalObject(input2_3);
+        // 完整的参数2
+        list.add(vm.addLocalObject(new ArrayObject(input2_1, input2_2, input2_3)));
+        Number number = module.callFunction(emulator, 0x5a38d, list.toArray())[0];
+        return vm.getObject(number.intValue()).getValue().toString();
+    };
+
+指定一个空对象的对象数组：
+public void main111(){
+        List<Object> list = new ArrayList<>(10);
+        list.add(vm.getJNIEnv());
+        list.add(0);
+        list.add(111);
+        DvmObject<?> obj = vm.resolveClass("java/lang/object").newObject(null);
+        vm.addLocalObject(obj);
+        ArrayObject myobject = new ArrayObject(obj);
+        vm.addLocalObject(myobject);
+        list.add(vm.addLocalObject(myobject));
+        module.callFunction(emulator, 0x5a38d, list.toArray());
+    };
+```
+
+
 
 ## 1.3 奇技淫巧
 
@@ -289,17 +380,164 @@ public void callMd5(){
 - 通过base+offset inline wrap内部函数，在IDA看到为sub_xxx那些
 
 ```java
-    public void hook_315B0(){
-        IHookZz hookZz = HookZz.getInstance(emulator);
-        hookZz.enable_arm_arm64_b_branch();
-        hookZz.instrument(module.base + 0x315B0 + 1, new InstrumentCallback<Arm32RegisterContext>() {
-            @Override
-            public void dbiCall(Emulator<?> emulator, Arm32RegisterContext ctx, HookEntryInfo info) {
-                System.out.println("R2:"+ctx.getR2Long());
+public void hook_315B0(){
+     IHookZz hookZz = HookZz.getInstance(emulator);
+     hookZz.enable_arm_arm64_b_branch();
+     hookZz.instrument(module.base + 0x315B0 + 1, new InstrumentCallback<Arm32RegisterContext>() {
+     @Override
+     public void dbiCall(Emulator<?> emulator, Arm32RegisterContext ctx, HookEntryInfo info) 				{
+         System.out.println("R2:"+ctx.getR2Long());
             }
         })
     }
 ```
+
+### 1.3.6 Trace
+
+```Java
+// emulator.traceCode(module.base, module.base + module.size);
+// 保存的path
+String traceFile = "unidbg-android/src/test/java/com/lession5/qxstrace.txt";
+PrintStream traceStream = new PrintStream(new FileOutputStream(traceFile), true);
+emulator.traceCode(module.base, module.base+module.size).setRedirect(traceStream);
+```
+
+增加寄存器值信息:
+
+- AbstractARMEmulator.java
+
+  ```java
+  // 添加值显示
+  private void printAssemble(PrintStream out, Capstone.CsInsn[] insns, long address, boolean thumb) {
+      StringBuilder sb = new StringBuilder();
+      for (Capstone.CsInsn ins : insns) {
+          sb.append("### Trace Instruction ");
+          sb.append(ARM.assembleDetail(this, ins, address, thumb));
+          // 打印每条汇编指令里参与运算的寄存器的值
+          Set<Integer> regset = new HashSet<Integer>();
+  
+          Arm.OpInfo opInfo = (Arm.OpInfo) ins.operands;
+          for(int i = 0; i<opInfo.op.length; i++){
+              regset.add(opInfo.op[i].value.reg);
+          }
+          String RegChange = ARM.SaveRegs(this, regset);
+          sb.append(RegChange);
+          sb.append('\n');
+          address += ins.size;
+      }
+      out.print(sb);
+  }
+  ```
+
+- src/main/java/com/github/unidbg/arm/ARM.java 中，新建SaveRegs方法，实际上就是showregs的代码，只不过从print改成return回来而已
+
+  ```java
+  public static String SaveRegs(Emulator<?> emulator, Set<Integer> regs) {
+          Backend backend = emulator.getBackend();
+          StringBuilder builder = new StringBuilder();
+          builder.append(">>>");
+          Iterator it = regs.iterator();
+          while(it.hasNext()) {
+              int reg = (int) it.next();
+              Number number;
+              int value;
+              switch (reg) {
+                  case ArmConst.UC_ARM_REG_R0:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " r0=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R1:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " r1=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R2:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " r2=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R3:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " r3=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R4:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " r4=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R5:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " r5=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R6:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " r6=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R7:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " r7=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R8:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " r8=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R9: // UC_ARM_REG_SB
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " sb=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_R10: // UC_ARM_REG_SL
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " sl=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_FP:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " fp=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_IP:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " ip=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_SP:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " SP=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_LR:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " LR=0x%x", value));
+                      break;
+                  case ArmConst.UC_ARM_REG_PC:
+                      number = backend.reg_read(reg);
+                      value = number.intValue();
+                      builder.append(String.format(Locale.US, " PC=0x%x", value));
+                      break;
+              }
+          }
+          return builder.toString();
+      }
+  ```
+
+### 1.3.7 补一个完整类
+
+- 涉及的环境缺失是JAVA环境，具体地说，主要就是com.bilibili.nativelibrary.SignedQuery这个类的问题。
+
+  可以直接JADX中复制这个类，直接拿过来用，Unidbg提供了另外一种模拟Native调用JAVA的方式——缺啥补啥，其原理是JAVA的反射。
+
+- 主要两点改变，运行后会报错找不到缺少的那个类，补上就可以了。
+
+  - LibBili1 不继承自AbstractJni
+  - vm.setJni(this);改成 vm.setDvmClassFactory(new ProxyClassFactory());
 
 
 
@@ -327,6 +565,7 @@ public DvmObject<?> callObjectMethodV(BaseVM vm, DvmObject<?> dvmObject, String 
   switch (signature) {
     case "android/content/Context->getClass()Ljava/lang/Class;":{
       // 此时的dvmObject就是Context实例,.getObjectType方法获取类型
+      // Context为主体所以用dvmObject获取
       return dvmObject.getObjectType();
     }
     case "java/util/UUID->toString()Ljava/lang/String;":{
@@ -379,3 +618,74 @@ public DvmObject<?> callStaticObjectMethodV(BaseVM vm, DvmClass dvmClass, String
 };
 ```
 
+### 1.4.5 VarArg的使用
+
+![](pic/01.b.png)
+
+- 主体: dvmObject.getValue是获取treeMap的对象，参数: key的对象用VarArg获取(从app中)不是自己构造。
+
+```java
+    @Override
+    public DvmObject<?> callObjectMethod(BaseVM vm, DvmObject<?> dvmObject, String signature, VarArg varArg) 		{
+        switch (signature) {
+            case "java/util/Map->get(Ljava/lang/Object;)Ljava/lang/Object;":
+                StringObject keyobject = varArg.getObjectArg(0);
+                String key = keyobject.getValue();
+            		// getValue得到的就是本身对象，可以各种使用对应的api
+                TreeMap<String, String> treeMap = (TreeMap<String, String>)dvmObject.getValue();
+                String value = treeMap.get(key);
+                return new StringObject(vm, value);
+        }
+        return super.callObjectMethod(vm, dvmObject, signature, varArg);
+		}
+```
+
+```java
+    @Override
+    public DvmObject<?> callStaticObjectMethod(BaseVM vm, DvmClass dvmClass, String signature, VarArg varArg) {
+        switch (signature){
+            // SignedQuery的r方法自己定义
+            case "com/bilibili/nativelibrary/SignedQuery->r(Ljava/util/Map;)Ljava/lang/String;":{
+                DvmObject<?> mapObject = varArg.getObjectArg(0);
+                // getValue 获取对象本身
+                TreeMap<String, String> mymap = (TreeMap<String, String>) mapObject.getValue();
+                String result = utils.r(mymap);
+                return new StringObject(vm, result);
+            }
+        }
+        return super.callStaticObjectMethod(vm, dvmClass, signature, varArg);
+    }
+```
+
+### 1.4.6 文件访问
+
+- 第一种方式：
+
+  文件访问的情况各种各样，比如从app的某个xml文件中读取key，读取某个资源文件的图片做运算，读取proc/self 目录下的文件反调试等等。当样本做文件访问时，Unidbg重定向到本机的某个位置，进入 src/main/java/com/github/unidbg/file/BaseFileSystem.java，打印一下路径
+
+```
+[15:14:10 318]  INFO [com.github.unidbg.linux.ARM32SyscallHandler] (ARM32SyscallHandler:1890) - openat dirfd=-100, pathname=/data/app/com.sankuai.meituan-TEfTAIBttUmUzuVbwRK1DQ==/base.apk, oflags=0x20000, mode=0
+```
+
+接下来我们按照要求，在data目录下新建对应文件夹`/data/app/com.sankuai.meituan-TEfTAIBttUmUzuVbwRK1DQ==`，并把我们的apk复制进去，改名成base.apk，就可以了。
+
+- 第二种方式：
+
+  1. public class NBridge extends AbstractJni implements IOResolver 
+
+  2. emulator.getSyscallHandler().addIOResolver(this)
+
+  3. ```java
+     @Override
+         public FileResult resolve(Emulator emulator, String pathname, int oflags) {
+             if (("/data/app/com.sankuai.meituan-TEfTAIBttUmUzuVbwRK1DQ==/base.apk").equals(pathname)) {
+                 // 填入想要重定位的文件
+                 return FileResult.success(new SimpleFileIO(oflags, new File("unidbg-android/src/test/java/com/lession7/mt.apk"), pathname));
+             }
+             return null;
+         }
+     ```
+
+     
+
+  
