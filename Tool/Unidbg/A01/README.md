@@ -394,6 +394,8 @@ public void hook_315B0(){
 
 ### 1.3.6 Trace
 
+- trace出来的结果几万行应该不存在高度的OLLVM混淆，也说明运算逻辑不会太复杂，否则应该百万行起步
+
 ```Java
 // emulator.traceCode(module.base, module.base + module.size);
 // 保存的path
@@ -539,6 +541,39 @@ emulator.traceCode(module.base, module.base+module.size).setRedirect(traceStream
   - LibBili1 不继承自AbstractJni
   - vm.setJni(this);改成 vm.setDvmClassFactory(new ProxyClassFactory());
 
+### 1.3.8 打开系统调用日志
+
+在main下面写:
+
+```java
+public static void main(String[] args){
+  Logger.getLogger("com.github.unidbg.linux.ARM32SyscallHandler").setLevel(Level.DEBUG);
+  Logger.getLogger("com.github.unidbg.unix.UnixSyscallHandler").setLevel(Level.DEBUG);
+  Logger.getLogger("com.github.unidbg.AbstractEmulator").setLevel(Level.DEBUG);
+  Logger.getLogger("com.github.unidbg.linux.android.dvm.DalvikVM").setLevel(Level.DEBUG);
+  Logger.getLogger("com.github.unidbg.linux.android.dvm.BaseVM").setLevel(Level.DEBUG);
+  Logger.getLogger("com.github.unidbg.linux.android.dvm").setLevel(Level.DEBUG);
+  demo2 test = new demo2();
+  System.out.println("call demo2");
+  System.out.println(test.call());
+}
+```
+
+### 1.3.9 Unidbg VirtualModule
+
+如果SO的依赖项中有Unidbg不支持的系统SO怎么办 ?
+
+```java
+vm = emulator.createDalvikVM(new File("unidbg-android/src/test/java/com/lession8/demo2.apk"));
+// 注册libandroid.so虚拟模块
+new AndroidModule(emulator, vm).register(memory);
+
+DalvikModule dm = vm.loadLibrary(new File("unidbg-android/src/test/java/com/lession8/readassets.so"), true);
+module = dm.getModule();
+```
+
+需要注意，一定要在样本SO加载前加载它，道理也很简单，系统SO肯定比用户SO加载的早。VirtualModule并不是一种真正意义上的加载SO，它本质上也是Hook，只不过实现了SO中少数几个函数罢了。
+
 
 
 ## 1.4 补环境
@@ -631,7 +666,7 @@ public DvmObject<?> callStaticObjectMethodV(BaseVM vm, DvmClass dvmClass, String
             case "java/util/Map->get(Ljava/lang/Object;)Ljava/lang/Object;":
                 StringObject keyobject = varArg.getObjectArg(0);
                 String key = keyobject.getValue();
-            		// getValue得到的就是本身对象，可以各种使用对应的api
+                // getValue得到的就是本身对象，可以各种使用对应的api
                 TreeMap<String, String> treeMap = (TreeMap<String, String>)dvmObject.getValue();
                 String value = treeMap.get(key);
                 return new StringObject(vm, value);
@@ -657,13 +692,26 @@ public DvmObject<?> callStaticObjectMethodV(BaseVM vm, DvmClass dvmClass, String
     }
 ```
 
-### 1.4.6 文件访问
+### 1.4.6 VaList
+
+```java
+    @Override
+    public DvmObject<?> callObjectMethodV(BaseVM vm, DvmObject<?> dvmObject, String signature, VaList vaList) {
+        switch (signature) {
+            case "android/content/Context>getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;":
+                return vm.resolveClass("android/content/SharedPreferences").newObject(vaList.getObject(0));
+        }
+        return super.callObjectMethodV(vm, dvmObject, signature, vaList);
+    }
+```
+
+### 1.4.7 文件访问
 
 - 第一种方式：
 
   文件访问的情况各种各样，比如从app的某个xml文件中读取key，读取某个资源文件的图片做运算，读取proc/self 目录下的文件反调试等等。当样本做文件访问时，Unidbg重定向到本机的某个位置，进入 src/main/java/com/github/unidbg/file/BaseFileSystem.java，打印一下路径
 
-```
+```java
 [15:14:10 318]  INFO [com.github.unidbg.linux.ARM32SyscallHandler] (ARM32SyscallHandler:1890) - openat dirfd=-100, pathname=/data/app/com.sankuai.meituan-TEfTAIBttUmUzuVbwRK1DQ==/base.apk, oflags=0x20000, mode=0
 ```
 
@@ -686,6 +734,14 @@ public DvmObject<?> callStaticObjectMethodV(BaseVM vm, DvmClass dvmClass, String
          }
      ```
 
-     
+  或者：
 
-  
+  ```java
+  @Override
+  public FileResult resolve(Emulator emulator, String pathname, int oflags) {
+    if ("/data/data/com.roysue.readsp/shared_prefs/two.xml".equals(pathname)) {
+      return FileResult.success(new ByteArrayFileIO(oflags, pathname,"mytest".getBytes()));
+    }
+    return null;
+  }
+  ```
