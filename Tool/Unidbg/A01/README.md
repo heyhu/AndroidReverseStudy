@@ -530,7 +530,76 @@ emulator.traceCode(module.base, module.base+module.size).setRedirect(traceStream
       }
   ```
 
-### 1.3.7 补一个完整类
+### 1.3.7 console debugger
+
+```java
+import com.github.unidbg.debugger.Debugger;
+// 在类的构造函数中添加
+Debugger debugger = emulator.attach();
+debugger.addBreakPoint(module.base + 0x1ecc + 1);
+
+//下面列举常见的断点命令
+1. mr0查看r0所指向的内存块，它等同于Frida native hook中的hexdump(this.context.r0)。
+2. 按c继续运行
+3. 输入bt指令回车（bt即backtrace缩写）打印调用栈。
+4. 查看函数离开后r0寄存器的值，r0此场景为buffer。
+   a）暂停到断点处的函数
+   b）mr0查看r0寄存器的值，此时r0寄存器的地址为0xbffff660。
+   c) 输入blr，此命令用于在函数返回时设置一个一次性断点
+   d）然后运行c运行函数，它此时在返回处断下来。有个问题，mr0这时候并不代表入参时的r0了，但没关系，记住mr0的address即可。
+   e）m0xbffff660 查看0xbffff660
+   f）c继续执行
+```
+
+### 1.3.8 traceRead
+
+- 对内存读写/访问的trace
+
+- 举例：查看程序对内存地址0xbffff660的值的引用
+
+  此时0xbffff660的值为：BD 39 85 65 07 4D F8 3A 3B 84 E1 4B 4E A0 F0 B5 EA
+
+```java
+emulator.traceRead(0xbffff620L, 0xbffff620L+20L);
+```
+
+trace的结果：
+
+```java
+### Memory READ at 0xbffff633, data size = 1, data value = 0xea pc=RX@0x40003c3e[libnative-lib.so]0x3c3e lr=RX@0x400fe617[libc.so]0x58617
+### Memory READ at 0xbffff62a, data size = 4, data value = 0xa04e4be1 pc=RX@0x40003c56[libnative-lib.so]0x3c56 lr=RX@0x400fe617[libc.so]0x58617
+```
+
+上述结果的意思为，在后续运算中，结果只有五个字节被使用到了分别是：0x3c3e地址使用了最后一个值0xEA 以及 0x3c56地址使用了0xa04e4be1
+
+### 1.3.9 traceWrite
+
+- 对结果的trace，此时程序最后结果为：
+
+```java
+JNIEnv->SetByteArrayRegion([B@77167fb7, 0, 7, unidbg@0xbffff5f8) was called from RX@0x4000185b[libnative-lib.so]0x185b
+JNIEnv->NewObject(class java/lang/String, <init>([B@77167fb7, "UTF-8") => "JCD2D38") was called from RX@0x4000186d[libnative-lib.so]0x186d
+```
+
+```java
+emulator.traceWrite(0xbffff5f8L, 0xbffff5f8L+7L);
+```
+
+trace的结果：
+
+```java
+### Memory WRITE at 0xbffff5fc, data size = 4, data value = 0x373635 pc=RX@0x40003c9c[libnative-lib.so]0x3c9c lr=RX@0x400fe617[libc.so]0x58617
+### Memory WRITE at 0xbffff5f8, data size = 4, data value = 0x34333231 pc=RX@0x40003ca0[libnative-lib.so]0x3ca0 lr=RX@0x400fe617[libc.so]0x58617
+### Memory WRITE at 0xbffff5f8, data size = 1, data value = 0x4a pc=RX@0x40003cba[libnative-lib.so]0x3cba lr=RX@0x40003cb1[libnative-lib.so]0x3cb1
+### Memory WRITE at 0xbffff5f9, data size = 1, data value = 0x43 pc=RX@0x40003cba[libnative-lib.so]0x3cba lr=RX@0x40003cb1[libnative-lib.so]0x3cb1
+### Memory WRITE at 0xbffff5fa, data size = 1, data value = 0x44 pc=RX@0x40003cba[libnative-lib.so]0x3cba lr=RX@0x40003cb1[libnative-lib.so]0x3cb1
+### Memory WRITE at 0xbffff5fb, data size = 1, data value = 0x32 pc=RX@0x40003cba[libnative-lib.so]0x3cba lr=RX@0x40003cb1[libnative-lib.so]0x3cb1
+### Memory WRITE at 0xbffff5fc, data size = 1, data value = 0x44 pc=RX@0x40003cba[libnative-lib.so]0x3cba lr=RX@0x40003cb1[libnative-lib.so]0x3cb1
+### Memory WRITE at 0xbffff5fe, data size = 1, data value = 0x38 pc=RX@0x40003d4e[libnative-lib.so]0x3d4e lr=RX@0x40003d3f[libnative-lib.so]0x3d3f
+### Memory WRITE at 0xbffff5fd, data size = 1, data value = 0x33 pc=RX@0x40003d56[libnative-lib.so]0x3d56 lr=RX@0x40003d3f[libnative-lib.so]0x3d3f
+```
+
+### 1.3.10 补一个完整类
 
 - 涉及的环境缺失是JAVA环境，具体地说，主要就是com.bilibili.nativelibrary.SignedQuery这个类的问题。
 
@@ -541,7 +610,7 @@ emulator.traceCode(module.base, module.base+module.size).setRedirect(traceStream
   - LibBili1 不继承自AbstractJni
   - vm.setJni(this);改成 vm.setDvmClassFactory(new ProxyClassFactory());
 
-### 1.3.8 打开系统调用日志
+### 1.3.11 打开系统调用日志
 
 在main下面写:
 
@@ -559,7 +628,7 @@ public static void main(String[] args){
 }
 ```
 
-### 1.3.9 Unidbg VirtualModule
+### 1.3.12 Unidbg VirtualModule
 
 如果SO的依赖项中有Unidbg不支持的系统SO怎么办 ?
 
