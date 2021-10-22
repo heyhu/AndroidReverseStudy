@@ -796,7 +796,7 @@ public DvmObject<?> callStaticObjectMethodV(BaseVM vm, DvmClass dvmClass, String
   ```java
      @Override
          public FileResult resolve(Emulator emulator, String pathname, int oflags) {
-             if (("/data/app/com.sankuai.meituan-TEfTAIBttUmUzuVbwRK1DQ==/base.apk").equals(pathname)) {
+             if (("proc/"+emulator.getPid()+"/cmdline").equals(pathname)) {
                  // 填入想要重定位的文件
                  return FileResult.success(new SimpleFileIO(oflags, newFile("D:\\unidbg-teach\\unidbg-android\\src\\test\\java\\com\\lession1\\cmdline"), pathname));
              }
