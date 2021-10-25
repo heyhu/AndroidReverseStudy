@@ -380,15 +380,25 @@ public void callMd5(){
 - 通过base+offset inline wrap内部函数，在IDA看到为sub_xxx那些
 
 ```java
-public void hook_315B0(){
-     IHookZz hookZz = HookZz.getInstance(emulator);
-     hookZz.enable_arm_arm64_b_branch();
-     hookZz.instrument(module.base + 0x315B0 + 1, new InstrumentCallback<Arm32RegisterContext>() {
-     @Override
-     public void dbiCall(Emulator<?> emulator, Arm32RegisterContext ctx, HookEntryInfo info) 				{
-         System.out.println("R2:"+ctx.getR2Long());
+    public void inlinehookEncryptWallEncode() {
+        IHookZz hookZz = HookZz.getInstance(emulator);
+        hookZz.enable_arm_arm64_b_branch();
+        hookZz.instrument(module.base + 0x9d24 + 1, new InstrumentCallback<Arm32RegisterContext>() {
+            @Override
+            public void dbiCall(Emulator<?> emulator, Arm32RegisterContext ctx, HookEntryInfo info) {
+                System.out.println("HookZz inline hook EncryptWallEncode");
+                Pointer input1 = ctx.getPointerArg(0);
+                Pointer input2 = ctx.getPointerArg(1);
+                Pointer input3 = ctx.getPointerArg(2);
+                buffer = ctx.getPointerArg(3);
             }
-        })
+        });
+        hookZz.instrument(module.base + 0x9d28 + 1, new InstrumentCallback<Arm32RegisterContext>() {
+            @Override
+            public void dbiCall(Emulator<?> emulator, Arm32RegisterContext ctx, HookEntryInfo info) {
+                Inspector.inspect(buffer.getByteArray(0, 0x100), "inline hookEncryptWallEncode");
+            }
+        });
     }
 ```
 
