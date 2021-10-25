@@ -281,7 +281,9 @@ Unidbg提供了`两种`方法打Patch，简单的需求可以调用Unicorn对虚
       }
   ```
 
-### 1.3.2 HookZz--参数位置
+### 1.3.2 Hook
+
+#### 1.3.2.1 HookZz--参数位置
 
 ```java
 public void HookMDStringold() {
@@ -307,7 +309,7 @@ public void HookMDStringold() {
     }
 ```
 
-### 1.3.3 HookZ--寄存器
+#### 1.3.2.2 HookZ--寄存器
 
 - 编写对该函数的Hook，首先因为不确定三个参数是指针还是数值，所以先全部做为数值处理，作为long类型看待，防止整数溢出
 - Inspector.inspect其效果类似于frida中hexdump
@@ -342,7 +344,7 @@ public void hook65540(){
 }
 ```
 
-### 1.3.4 主动调用
+#### 1.3.2.3 主动调用
 
 ```java
 public void callMd5(){
@@ -375,7 +377,7 @@ public void callMd5(){
     };
 ```
 
-### 1.3.5 Inline hook
+#### 1.3.2.4 Inline hook
 
 - 通过base+offset inline wrap内部函数，在IDA看到为sub_xxx那些
 
@@ -392,7 +394,97 @@ public void hook_315B0(){
     }
 ```
 
-### 1.3.6 Trace
+#### 1.3.2.5 call 参数传递，Unidbg封装的API
+
+```java
+    public void callByAddress(){
+        // args list
+        List<Object> list = new ArrayList<>(10);
+        // jnienv
+        list.add(vm.getJNIEnv());
+        // jclazz
+        list.add(0);
+        // str1
+        list.add(vm.addLocalObject(new StringObject(vm, "str1")));
+        // str2
+        list.add(vm.addLocalObject(new StringObject(vm, "str2")));
+        // str3
+        list.add(vm.addLocalObject(new StringObject(vm, "str3")));
+        // str4
+        list.add(vm.addLocalObject(new StringObject(vm, "str4")));
+        // str5
+        list.add(vm.addLocalObject(new StringObject(vm, "str5")));
+        // strArr 假设字符串包含两个字符串
+        // str6_1
+        StringObject str6_1 = new StringObject(vm, "str6_1");
+        vm.addLocalObject(str6_1);
+        // str6_2
+        StringObject str6_2 = new StringObject(vm, "str6_2");
+        vm.addLocalObject(str6_2);
+
+        ArrayObject arrayObject = new ArrayObject(str6_1,str6_2);
+        list.add(vm.addLocalObject(arrayObject));
+
+        // 最后的int
+        list.add(1);
+
+        Number number = module.callFunction(emulator, 0x2301, list.toArray())[0];
+        ArrayObject resultArr = vm.getObject(number.intValue());
+        System.out.println("result:"+resultArr);
+    };
+
+    public void callByAPI(){
+        DvmClass RequestCryptUtils = vm.resolveClass("com/meituan/android/payguard/RequestCryptUtils");
+
+        StringObject str6_1 = new StringObject(vm, "str6_1");
+        vm.addLocalObject(str6_1);
+        StringObject str6_2 = new StringObject(vm, "str6_2");
+        vm.addLocalObject(str6_2);
+        ArrayObject arrayObject = new ArrayObject(str6_1,str6_2);
+        ArrayObject result = RequestCryptUtils.callStaticJniMethodObject(emulator, "encryptRequestWithRandom()", "str1","str2", "str3","str4","str5",arrayObject,1);
+        System.out.println(result);
+    };
+```
+
+##### 1.3.2.6 Unicorn hook
+
+- 原生的办法进行Hook，代码量不小，但很多时候，我们会选择它，因为HookZz等工具有时 候会遇到BUG，而且使用HookZz等hook框架时，样本可以较容易的检测到自身代码片段被Hook，而 Unicorn原生的Hook不容易被检测，相当于是CPU自身在打印寄存器。
+
+```java
+public void hookByUnicorn(){
+  emulator.getBackend().hook_add_new(new CodeHook() {
+    @Override
+    public void onAttach(UnHook unHook) {
+    }
+
+    @Override
+    public void detach() {
+    }
+
+    @Override
+    public void hook(Backend backend, long address, int size, Object user) {
+      if(address == (module.base+0x9d24)){
+        System.out.println("Hook By Unicorn");
+        RegisterContext ctx = emulator.getContext();
+        Pointer input1 = ctx.getPointerArg(0);
+        Pointer input2 = ctx.getPointerArg(1);
+        Pointer input3 = ctx.getPointerArg(2);
+        // getString的参数i代表index,即input[i:]
+        System.out.println("参数1："+input1.getString(0));
+        System.out.println("参数2："+input2.getString(0));
+        System.out.println("参数3："+input3.getString(0));
+
+        buffer = ctx.getPointerArg(3);
+      }
+      if(address == (module.base+0x9d28)){
+        Inspector.inspect(buffer.getByteArray(0,0x100), "Unicorn hook EncryptWallEncode");
+      }
+    }
+  },module.base + 0x9d24, module.base + 0x9d28, null);
+}
+```
+
+### 1.3.3 Trace
 
 - trace出来的结果几万行应该不存在高度的OLLVM混淆，也说明运算逻辑不会太复杂，否则应该百万行起步
 
@@ -530,7 +622,7 @@ emulator.traceCode(module.base, module.base+module.size).setRedirect(traceStream
       }
   ```
 
-### 1.3.7 console debugger
+### 1.3.4 console debugger
 
 ```java
 import com.github.unidbg.debugger.Debugger;
@@ -549,9 +641,10 @@ debugger.addBreakPoint(module.base + 0x1ecc + 1);
    d）然后运行c运行函数，它此时在返回处断下来。有个问题，mr0这时候并不代表入参时的r0了，但没关系，记住mr0的address即可。
    e）m0xbffff660 查看0xbffff660
    f）c继续执行
+5. 基于Unicorn的Console Debugger同样不用因为thumb模式+1，会自己做转换。
 ```
 
-### 1.3.8 traceRead
+### 1.3.5 traceRead
 
 - 对内存读写/访问的trace
 
@@ -572,7 +665,7 @@ trace的结果：
 
 上述结果的意思为，在后续运算中，结果只有五个字节被使用到了分别是：0x3c3e地址使用了最后一个值0xEA 以及 0x3c56地址使用了0xa04e4be1
 
-### 1.3.9 traceWrite
+### 1.3.6 traceWrite
 
 - 对结果的trace，此时程序最后结果为：
 
@@ -587,6 +680,8 @@ emulator.traceWrite(0xbffff5f8L, 0xbffff5f8L+7L);
 
 trace的结果：
 
+说明在0x3cba等地方对想要监控的内存地址进行了操作，操作值为data value。
+
 ```java
 ### Memory WRITE at 0xbffff5fc, data size = 4, data value = 0x373635 pc=RX@0x40003c9c[libnative-lib.so]0x3c9c lr=RX@0x400fe617[libc.so]0x58617
 ### Memory WRITE at 0xbffff5f8, data size = 4, data value = 0x34333231 pc=RX@0x40003ca0[libnative-lib.so]0x3ca0 lr=RX@0x400fe617[libc.so]0x58617
@@ -599,7 +694,7 @@ trace的结果：
 ### Memory WRITE at 0xbffff5fd, data size = 1, data value = 0x33 pc=RX@0x40003d56[libnative-lib.so]0x3d56 lr=RX@0x40003d3f[libnative-lib.so]0x3d3f
 ```
 
-### 1.3.10 补一个完整类
+### 1.3.7 补一个完整类
 
 - 涉及的环境缺失是JAVA环境，具体地说，主要就是com.bilibili.nativelibrary.SignedQuery这个类的问题。
 
@@ -610,7 +705,7 @@ trace的结果：
   - LibBili1 不继承自AbstractJni
   - vm.setJni(this);改成 vm.setDvmClassFactory(new ProxyClassFactory());
 
-### 1.3.11 打开系统调用日志
+### 1.3.8 打开系统调用日志
 
 在main下面写:
 
@@ -628,7 +723,7 @@ public static void main(String[] args){
 }
 ```
 
-### 1.3.12 Unidbg VirtualModule
+### 1.3.9 Unidbg VirtualModule
 
 如果SO的依赖项中有Unidbg不支持的系统SO怎么办 ?
 
@@ -802,7 +897,7 @@ public DvmObject<?> callStaticObjectMethodV(BaseVM vm, DvmClass dvmClass, String
              }
              return null;
          }
-     ```
+  ```
 
   或者：
 
