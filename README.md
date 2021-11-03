@@ -48,7 +48,7 @@
 - [02.JNIEnv与反射](Android/A02/README.md)
 - [03.安卓so基本动态调试](Android/A03/README.md)
 - [04.安卓so每种哈希函数的特征](Android/A04/README.md)
-- [05.对称加密之DES]((Android/A05/README.md))
+- [05.对称加密之DES](Android/A05/README.md)
 - [06.对称加密之AES]((Android/A06/README.md))
 
 ## B.安卓源码编译
