@@ -281,6 +281,24 @@ Unidbg提供了`两种`方法打Patch，简单的需求可以调用Unicorn对虚
       }
   ```
 
+- 直接跳过函数执行处。在调用处下了一个断点，inline hook 都是在调用前断下来了，所以在行前断了下来，然后加了BreakPointCallback回调，在这个时机做处理，我们将PC指针直接往前加了 5，PC指向哪里，函数就执行哪里，本来PC指向“blx log”这个地址，程序即将去执行log函数。但我们直 接将PC加了5，为什么加5? 我们知道这里的log是个坑，它长四个字节，我们要越过这个坑，但加4不够，我们是thumb模式，再 +1，所以就是+5。
+
+  除此之外，OnHit命中断点时返回true，true表示不用断下来变成调试模式，继续往下走。
+
+  ```java
+      public void patchLog2() {
+          emulator.attach().addBreakPoint(module.base + 0xABE, new BreakPointCallback() {
+              @Override
+              public boolean onHit(Emulator<?> emulator, long address) {
+                  emulator.getBackend().reg_write(ArmConst.UC_ARM_REG_PC, (address) + 5);
+                  return true;
+              }
+          });
+      }
+  ```
+
+  
+
 ### 1.3.2 Hook
 
 #### 1.3.2.1 HookZz--参数位置
@@ -781,7 +799,22 @@ size: 112
 ^-----------------------------------------------------------------------------^
 ```
 
+### 1.3.11 Unidbg 报错时如何分析
 
+比如报错memory failed 
+
+- src/test/resources/log4j.properties中**INFO**全配置成**DEBUG**
+
+- 输入bt查看调用栈，ida中跳到对应函数地址`0x00abf`查看结果。
+
+  ```java
+  [15:22:35 859] DEBUG [net.fornwall.jelf.ArmExIdx] (ArmExIdx:274) - finish
+  [0x40000000][0x40000abf][   libwtf.so][0x00abf] Java_com_sichuanol_cbgc_util_SignManager_getSign + 0x18e
+  [15:22:35 860] DEBUG [net.fornwall.jelf.ArmExIdx] (ArmExIdx:153) - 
+  >-----------------------------------------------------------------------------<
+  ```
+
+  
 
 ## 1.4 补环境
 
