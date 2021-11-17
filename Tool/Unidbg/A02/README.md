@@ -8,7 +8,7 @@
   * [0x02. Hook](#0x02-Hook)
     - [HookZz--参数位置](#HookZz--参数位置)
     - [HookZz--寄存器](#HookZz--寄存器)
-    - [HookZz--Inline hook](#HookZz--Inline hook)
+    - [HookZz--InlineHook](#HookZz-InlineHook)
   * [0x03. 主动调用](#0x03-主动调用)
     - [使用原生函数](#使用原生函数)
     - [封装的API](#Unidbg封装的API)
@@ -184,7 +184,7 @@ public void hook65540(){
 }
 ```
 
-#### HookZz--Inline hook
+#### HookZz--InlineHook
 
 - 通过base+offset inline wrap内部函数，在IDA看到为sub_xxx那些
 
