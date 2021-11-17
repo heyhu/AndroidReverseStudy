@@ -9,8 +9,6 @@
     - [HookZz--参数位置](#HookZz--参数位置)
     - [HookZz--寄存器](#HookZz--寄存器)
     - [HookZz--Inline hook](#HookZz--Inline hook)
-    - [Unicorn hook](#Unicorn hook)
-    - [Console Debugger](#console debugger)
   * [0x03. 主动调用](#0x03-主动调用)
     - [使用原生函数](#使用原生函数)
     - [封装的API](#Unidbg封装的API)
