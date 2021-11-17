@@ -1,4 +1,4 @@
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- @import "[TOC]" {cmd="toc" depthFrom=3 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
 * [基础配置](#基础配置)
