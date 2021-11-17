@@ -3,7 +3,7 @@
 <!-- code_chunk_output -->
 
 - [基础配置](#基础配置)
-  - [初始化](#1.1 初始化)
+  - [初始化](#初始化)
   - [执行目标函数--参数构造](#执行目标函数--参数构造)
     - [字节数组以及布尔值](#字节数组以及布尔值)
     - [context以及字符串类型](#context以及字符串类型)
@@ -14,7 +14,7 @@
 
 ## 基础配置
 
-### 1.1 初始化
+### 初始化
 
 ```java
 package com.lession1;
@@ -65,13 +65,13 @@ public class oasis extends AbstractJni{
 }
 ```
 
-### 1.2 执行目标函数--参数构造
+### 执行目标函数--参数构造
 
 - 字节数组需要裹上unidbg的包装类，并加到本地变量里，两件事缺一不可。
 - 除了基本类型，比如int，long等，其他的对象类型一律要手动 `addLocalObject`。
 - vm.getObject(number.intValue()).getValue().toString() 解释：在DalvikVM中有Map存储了jni交互的对象，key是该对象的hash，value是该对象。这个intValue就是这个对象的hash，通过vm.getObject方法，来取出这个hash对应的Object。
 
-#### 1.2.1 字节数组以及布尔值
+#### 字节数组以及布尔值
 
 ```java
    public String getS(){
@@ -102,7 +102,7 @@ public class oasis extends AbstractJni{
     }
 ```
 
-#### 1.2.2 context以及字符串类型
+#### context以及字符串类型
 
 ```java
    public String calculateS(){
@@ -123,7 +123,7 @@ public class oasis extends AbstractJni{
     };
 ```
 
-#### 1.2.3 treemap
+#### treemap
 
 ```java
     public void s(){
@@ -173,7 +173,7 @@ public class oasis extends AbstractJni{
     };
 ```
 
-#### 1.2.4 对象数组
+#### 对象数组
 
 ```java
 public String main203(){
