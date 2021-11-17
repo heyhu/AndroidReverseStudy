@@ -57,7 +57,7 @@
 
 `致谢`
 
- 以下内容完全来自`r0ysue`以及`龙哥`的知识星球
+ 以上内容完全来自`r0ysue`以及`龙哥`的知识星球
 
 <img src="FRIDA/A01/pic/planet.jpeg" alt="planet" style="zoom:25%;" />
 
