@@ -3,31 +3,31 @@
 
 * [奇技淫巧](#奇技淫巧)
 
-  - [PatchCode](#PatchCode)
+  - [0x01. PatchCode](#0x01-PatchCode)
 
-  * [Hook](#Hook)
+  * [0x02. Hook](#0x02-Hook)
     - [HookZz--参数位置](#HookZz--参数位置)
     - [HookZz--寄存器](#HookZz--寄存器)
     - [HookZz--Inline hook](#HookZz--Inline hook)
     - [Unicorn hook](#Unicorn hook)
-    - [console debugger](#console debugger)
-  * [主动调用](#主动调用)
+    - [Console Debugger](#console debugger)
+  * [0x03. 主动调用](#0x03-主动调用)
     - [使用原生函数](#使用原生函数)
     - [封装的API](#Unidbg封装的API)
-  * [Trace](#Trace)
+  * [0x04. Trace](#0x04-Trace)
     - [打印寄存器的值](#打印寄存器的值)
     - [traceRead](#traceRead)
     - [traceWrite](#traceWrite)
-  * [Unidbg使用反射补Java的类](#Unidbg使用反射补Java的类)
-  * [打开系统调用日志](#打开系统调用日志)
-  * [加载Unidbg中不支持的SO](#加载Unidbg中不支持的SO)
-  * [使用Unidbg打印函数参数5之后的值](#使用Unidbg打印函数参数5之后的值)
+  * [0x05. Unidbg使用反射补Java的类](#0x05-Unidbg使用反射补Java的类)
+  * [0x06. 打开系统调用日志](#0x06-打开系统调用日志)
+  * [0x07. 加载Unidbg中不支持的SO](#0x07-加载Unidbg中不支持的SO)
+  * [0x08. 使用Unidbg打印函数参数5之后的值](#0x08-使用Unidbg打印函数参数5之后的值)
 
 <!-- /code_chunk_output -->
 
 ## 奇技淫巧
 
-### PatchCode
+### 0x01. PatchCode
 
 报错日志：
 
@@ -123,7 +123,7 @@ Unidbg提供了`两种`方法打Patch，简单的需求可以调用Unicorn对虚
   ```
 
 
-### Hook
+### 0x02. Hook
 
 #### HookZz--参数位置
 
@@ -273,7 +273,7 @@ debugger.addBreakPoint(module.base + 0x1ecc + 1);
 5. 基于Unicorn的Console Debugger同样不用因为thumb模式+1，会自己做转换。
 ```
 
-### 主动调用
+### 0x03. 主动调用
 
 #### 使用原生函数
 
@@ -360,7 +360,7 @@ public void callMd5(){
     };
 ```
 
-### Trace
+### 0x04. Trace
 
 #### 打印寄存器的值
 
@@ -550,7 +550,7 @@ trace的结果：
 ### Memory WRITE at 0xbffff5fd, data size = 1, data value = 0x33 pc=RX@0x40003d56[libnative-lib.so]0x3d56 lr=RX@0x40003d3f[libnative-lib.so]0x3d3f
 ```
 
-### Unidbg使用反射补Java的类
+### 0x05. Unidbg使用反射补Java的类
 
 - 涉及的环境缺失是JAVA环境，具体地说，主要就是com.bilibili.nativelibrary.SignedQuery这个类的问题。
 
@@ -563,7 +563,7 @@ trace的结果：
 
 - [原文传送](https://blog.csdn.net/qq_38851536/article/details/117923970)
 
-### 打开系统调用日志
+### 0x06. 打开系统调用日志
 
 - 方法一
 
@@ -585,7 +585,7 @@ public static void main(String[] args){
 
    src/test/resources/log4j.properties中**INFO**全配置成**DEBUG**
 
-### 加载Unidbg中不支持的SO
+### 0x07. 加载Unidbg中不支持的SO
 
 - 比如libandroid.so可以使用`AndroidModule`
 
@@ -600,7 +600,7 @@ module = dm.getModule();
 
 需要注意，一定要在样本SO加载前加载它，道理也很简单，系统SO肯定比用户SO加载的早。VirtualModule并不是一种真正意义上的加载SO，它本质上也是Hook，只不过实现了SO中少数几个函数罢了。
 
-### 使用Unidbg打印函数参数5之后的值
+### 0x08. 使用Unidbg打印函数参数5之后的值
 
 [常见函数调用约定](https://bbs.pediy.com/thread-224583.htm)
 
