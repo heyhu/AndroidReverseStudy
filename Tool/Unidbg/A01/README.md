@@ -175,6 +175,8 @@ public class oasis extends AbstractJni{
 
 #### 对象数组
 
+[原文传送](https://blog.csdn.net/qq_38851536/article/details/118000259)
+
 ```java
 public String main203(){
         List<Object> list = new ArrayList<>(10);
