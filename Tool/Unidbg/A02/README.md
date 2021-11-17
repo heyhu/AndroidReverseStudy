@@ -3,31 +3,31 @@
 
 * [奇技淫巧](#奇技淫巧)
 
-  - [1.1 PatchCode](#1.1 PatchCode)
+  - [PatchCode](#PatchCode)
 
-  * [1.2 Hook](#1.2 Hook)
-    - [1.2.1 HookZz--参数位置](#1.2.1 HookZz--参数位置)
-    - [1.2.2 HookZz--寄存器](#1.2.2 HookZz--寄存器)
-    - [1.2.3 HookZz--Inline hook](#1.2.3 HookZz--Inline hook)
-    - [1.2.4 Unicorn hook](#1.2.4 Unicorn hook)
-    - [1.2.5 console debugger](#1.2.5 console debugger)
-  * [1.3 主动调用](#1.3 主动调用)
-    - [1.3.1 使用原生函数](#1.3.1 使用原生函数)
-    - [1.3.2 封装的API](#1.3.2 Unidbg封装的API)
-  * [1.4 Trace](#1.4 Trace)
-    - [1.4.1 打印寄存器的值](#1.4.1 打印寄存器的值)
-    - [1.4.2 traceRead](#1.4.2 traceRead)
-    - [1.4.3 traceWrite](#1.4.3 traceWrite)
-  * [1.5 Unidbg使用反射补Java的类](#1.5 Unidbg使用反射补Java的类)
-  * [1.6 打开系统调用日志](#1.6 打开系统调用日志)
-  * [1.7 加载Unidbg中不支持的SO](#1.7 加载Unidbg中不支持的SO)
-  * [1.8 使用Unidbg打印函数参数5之后的值](#1.8 使用Unidbg打印函数参数5之后的值)
+  * [Hook](#Hook)
+    - [HookZz--参数位置](#HookZz--参数位置)
+    - [HookZz--寄存器](#HookZz--寄存器)
+    - [HookZz--Inline hook](#HookZz--Inline hook)
+    - [Unicorn hook](#Unicorn hook)
+    - [console debugger](#console debugger)
+  * [主动调用](#主动调用)
+    - [使用原生函数](#使用原生函数)
+    - [封装的API](#Unidbg封装的API)
+  * [Trace](#Trace)
+    - [打印寄存器的值](#打印寄存器的值)
+    - [traceRead](#traceRead)
+    - [traceWrite](#traceWrite)
+  * [Unidbg使用反射补Java的类](#Unidbg使用反射补Java的类)
+  * [打开系统调用日志](#打开系统调用日志)
+  * [加载Unidbg中不支持的SO](#加载Unidbg中不支持的SO)
+  * [使用Unidbg打印函数参数5之后的值](#使用Unidbg打印函数参数5之后的值)
 
 <!-- /code_chunk_output -->
 
 ## 奇技淫巧
 
-### 1.1 PatchCode
+### PatchCode
 
 报错日志：
 
@@ -123,9 +123,9 @@ Unidbg提供了`两种`方法打Patch，简单的需求可以调用Unicorn对虚
   ```
 
 
-### 1.2 Hook
+### Hook
 
-#### 1.2.1 HookZz--参数位置
+#### HookZz--参数位置
 
 ```java
 public void HookMDStringold() {
@@ -151,7 +151,7 @@ public void HookMDStringold() {
     }
 ```
 
-#### 1.2.2 HookZz--寄存器
+#### HookZz--寄存器
 
 - 编写对该函数的Hook，首先因为不确定三个参数是指针还是数值，所以先全部做为数值处理，作为long类型看待，防止整数溢出
 - Inspector.inspect其效果类似于frida中hexdump
@@ -186,7 +186,7 @@ public void hook65540(){
 }
 ```
 
-#### 1.2.3 HookZz--Inline hook
+#### HookZz--Inline hook
 
 - 通过base+offset inline wrap内部函数，在IDA看到为sub_xxx那些
 
@@ -213,7 +213,7 @@ public void hook65540(){
     }
 ```
 
-#### 1.2.4 Unicorn hook
+#### Unicorn hook
 
 - 原生的办法进行Hook，代码量不小，但很多时候，我们会选择它，因为HookZz等工具有时 候会遇到BUG，而且使用HookZz等hook框架时，样本可以较容易的检测到自身代码片段被Hook，而 Unicorn原生的Hook不容易被检测，相当于是CPU自身在打印寄存器。
 
@@ -251,7 +251,7 @@ public void hookByUnicorn(){
 }
 ```
 
-#### 1.2.5 console debugger
+#### console debugger
 
 ```java
 import com.github.unidbg.debugger.Debugger;
@@ -273,9 +273,9 @@ debugger.addBreakPoint(module.base + 0x1ecc + 1);
 5. 基于Unicorn的Console Debugger同样不用因为thumb模式+1，会自己做转换。
 ```
 
-### 1.3 主动调用
+### 主动调用
 
-#### 1.3.1 使用原生函数
+#### 使用原生函数
 
 ```java
 public void callMd5(){
@@ -308,7 +308,7 @@ public void callMd5(){
     };
 ```
 
-#### 1.3.2 Unidbg封装的API
+#### Unidbg封装的API
 
 ```java
     public void callByAddress(){
@@ -360,9 +360,9 @@ public void callMd5(){
     };
 ```
 
-### 1.4 Trace
+### Trace
 
-#### 1.4.1 打印寄存器的值
+#### 打印寄存器的值
 
 - trace出来的结果几万行应该不存在高度的OLLVM混淆，也说明运算逻辑不会太复杂，否则应该百万行起步
 
@@ -500,7 +500,7 @@ emulator.traceCode(module.base, module.base+module.size).setRedirect(traceStream
       }
   ```
 
-#### 1.4.2 traceRead
+#### traceRead
 
 - 打印对某连续地址进行读操作的相关信息
 
@@ -521,7 +521,7 @@ trace的结果：
 
 上述结果的意思为，在后续运算中，结果只有五个字节被使用到了分别是：0x3c3e地址使用了最后一个值0xEA 以及 0x3c56地址使用了0xa04e4be1
 
-#### 1.4.3 traceWrite
+#### traceWrite
 
 - 打印对某连续地址进行写操作的相关信息
 
@@ -550,7 +550,7 @@ trace的结果：
 ### Memory WRITE at 0xbffff5fd, data size = 1, data value = 0x33 pc=RX@0x40003d56[libnative-lib.so]0x3d56 lr=RX@0x40003d3f[libnative-lib.so]0x3d3f
 ```
 
-### 1.5 Unidbg使用反射补Java的类
+### Unidbg使用反射补Java的类
 
 - 涉及的环境缺失是JAVA环境，具体地说，主要就是com.bilibili.nativelibrary.SignedQuery这个类的问题。
 
@@ -563,7 +563,7 @@ trace的结果：
 
 - [原文传送](https://blog.csdn.net/qq_38851536/article/details/117923970)
 
-### 1.6 打开系统调用日志
+### 打开系统调用日志
 
 - 方法一
 
@@ -585,7 +585,7 @@ public static void main(String[] args){
 
    src/test/resources/log4j.properties中**INFO**全配置成**DEBUG**
 
-### 1.7 加载Unidbg中不支持的SO
+### 加载Unidbg中不支持的SO
 
 - 比如libandroid.so可以使用`AndroidModule`
 
@@ -600,7 +600,7 @@ module = dm.getModule();
 
 需要注意，一定要在样本SO加载前加载它，道理也很简单，系统SO肯定比用户SO加载的早。VirtualModule并不是一种真正意义上的加载SO，它本质上也是Hook，只不过实现了SO中少数几个函数罢了。
 
-### 1.8 使用Unidbg打印函数参数5之后的值
+### 使用Unidbg打印函数参数5之后的值
 
 [常见函数调用约定](https://bbs.pediy.com/thread-224583.htm)
 
