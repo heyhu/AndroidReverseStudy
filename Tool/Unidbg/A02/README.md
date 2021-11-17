@@ -8,7 +8,9 @@
   * [0x02. Hook](#0x02-Hook)
     - [HookZz--参数位置](#HookZz--参数位置)
     - [HookZz--寄存器](#HookZz--寄存器)
-    - [HookZz--InlineHook](#HookZz-InlineHook)
+    - [HookZz--InlineHook](#HookZz--InlineHook)
+    - [UnicornHook](#UnicornHook)
+    - [ConsoleDebugger](#ConsoleDebugger)
   * [0x03. 主动调用](#0x03-主动调用)
     - [使用原生函数](#使用原生函数)
     - [封装的API](#Unidbg封装的API)
@@ -211,7 +213,7 @@ public void hook65540(){
     }
 ```
 
-#### Unicorn hook
+#### UnicornHook
 
 - 原生的办法进行Hook，代码量不小，但很多时候，我们会选择它，因为HookZz等工具有时 候会遇到BUG，而且使用HookZz等hook框架时，样本可以较容易的检测到自身代码片段被Hook，而 Unicorn原生的Hook不容易被检测，相当于是CPU自身在打印寄存器。
 
@@ -249,7 +251,7 @@ public void hookByUnicorn(){
 }
 ```
 
-#### console debugger
+#### ConsoleDebugger
 
 ```java
 import com.github.unidbg.debugger.Debugger;
