@@ -8,7 +8,7 @@
     - [返回PID](#返回PID)
     - [使用java的api返回一个对象](#使用java的api返回一个对象)
     - [VarArg的使用](#VarArg的使用)
-    - [ VaList的使用](# VaList的使用)
+    - [VaList的使用](#VaList的使用)
   * [0x02. 文件访问](#0x02-文件访问)
     * [实体路径](#实体路径)
     * [代码方式](#代码方式)
@@ -135,7 +135,7 @@ public DvmObject<?> callStaticObjectMethodV(BaseVM vm, DvmClass dvmClass, String
     }
 ```
 
-####  VaList的使用
+#### VaList的使用
 
 ```java
     @Override
