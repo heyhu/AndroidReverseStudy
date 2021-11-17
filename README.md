@@ -3,12 +3,6 @@
 
 ---
 
-`致谢`
-
- 以下内容完全来自`r0ysue`的知识星球
-
----
-
 # 《FRIDA系列》
 ## A.配置与使用  
 - [01.FRIDA](FRIDA/A01/README.md)
@@ -39,8 +33,8 @@
 ## C.Unidbg篇
 
 - [01.Unidbg-基础配置](Tool/Unidbg/A01/README.md)
-- [01.Unidbg-奇技淫巧](Tool/Unidbg/A02/README.md)
-- [01.Unidbg-补环境](Tool/Unidbg/A03/README.md)
+- [02.Unidbg-奇技淫巧](Tool/Unidbg/A02/README.md)
+- [03.Unidbg-补环境](Tool/Unidbg/A03/README.md)
 
 ---
 
@@ -58,3 +52,13 @@
 - [02.AOSP源码修改-制作简易沙箱](Android/B02/README.md)
 - [03.AOSP源码修改-自制沙箱进行无感知抓包](Android/B03/README.md)
 - [04.刷机](Android/B04/README.md)
+
+----
+
+`致谢`
+
+ 以下内容完全来自`r0ysue`以及`龙哥`的知识星球
+
+<img src="FRIDA/A01/pic/planet.jpeg" alt="planet" style="zoom:25%;" />
+
+<img src="Tool/Unidbg/A02/pic/planet.jpeg" alt="planet" style="zoom:25%;" />
