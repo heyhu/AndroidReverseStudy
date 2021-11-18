@@ -23,6 +23,8 @@
 
 #### 构造最基本Context实例
 
+- 如果这个东西后续用不到，是应付了事，就填null，如果后续只需要唯一标识这个对象，那就填signature，如果后续需要真的使用这个对象的内容，那就填其内容。
+
 ```java
 @Override
 public DvmObject<?> callStaticObjectMethodV(BaseVM vm, DvmClass dvmClass, String signature, VaList vaList) {
@@ -35,6 +37,23 @@ public DvmObject<?> callStaticObjectMethodV(BaseVM vm, DvmClass dvmClass, String
 }
 ```
 
+- 案例：https://blog.csdn.net/qq_38851536/article/details/118024298
+
+  假设APP在JNI中从五个SharedPreferences里读了十五个键值对，并且不同xml的键名有重复，如果每次取SharedPreferences时我们都返回空对象，那后面怎么区分a.xml和b.xml里键名都是name的数据呢？
+
+  先前我们说，参数1是想要获取的SharedPreferences的名字，应该把它放对象里返回，这样就有了”标识性“
+
+
+```java
+@Override
+public DvmObject<?> callObjectMethodV(BaseVM vm, DvmObject<?> dvmObject, String signature, VaList vaList) {
+    switch (signature) {
+        case "android/content/Context->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;":
+            return vm.resolveClass("android/content/SharedPreferences").newObject(vaList.getObject(0));
+    }
+    return super.callObjectMethodV(vm, dvmObject, signature, vaList);
+}
+```
 #### Context实例的getClass方法
 
 ```java
