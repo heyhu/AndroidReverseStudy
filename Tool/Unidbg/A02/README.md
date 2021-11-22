@@ -22,6 +22,7 @@
   * [0x06. 打开系统调用日志](#0x06-打开系统调用日志)
   * [0x07. 加载Unidbg中不支持的SO](#0x07-加载Unidbg中不支持的SO)
   * [0x08. 使用Unidbg打印函数参数5之后的值](#0x08-使用Unidbg打印函数参数5之后的值)
+  * [0x09. 使用Unidbg打印jobject](#0x09-使用Unidbg打印jobject)
 
 <!-- /code_chunk_output -->
 
@@ -657,4 +658,25 @@ size: 112
 0050: 00 A0 03 40 48 A1 03 40 00 00 00 00 4C 00 21 40    ...@H..@....L.!@
 0060: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
 ^-----------------------------------------------------------------------------^
+```
+
+### 0x09. 使用Unidbg打印jobject
+
+[原文传送](https://blog.csdn.net/qq_38851536/article/details/118122592)
+
+有个jobject对象，想查看它的内容，最常见的就是jbyteArray。
+
+Frida中可以这么操作：`hexdump(ptr(Java.vm.tryGetEnv().getByteArrayElements(args[0])))`
+Unidbg中当然也可以，以hookZz中为例：
+
+```java
+public void preCall(Emulator<?> emulator, HookZzArm32RegisterContext ctx, HookEntryInfo info) {
+    UnidbgPointer jbytearrayptr = ctx.getPointerArg(2);
+    DvmObject<?> dvmbytes = vm.getObject(jbytearrayptr.toIntPeer());
+    // 取出byte
+    byte[] result = (byte[]) dvmbytes.getValue();
+    // 转换成String 或者按需转成其他
+    System.out.println(new String(result));
+};
+
 ```

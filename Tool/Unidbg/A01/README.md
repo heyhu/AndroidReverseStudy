@@ -9,6 +9,7 @@
     - [context以及字符串类型](#context以及字符串类型)
     - [treemap](#treemap)
     - [对象数组](#对象数组)
+    - [Long参数的传递](#Long参数的传递)
 
 <!-- /code_chunk_output -->
 
@@ -209,3 +210,21 @@ public void main111(){
         module.callFunction(emulator, 0x5a38d, list.toArray());
     };
 ```
+
+#### Long参数的传递
+
+假设一个native函数中参数是long类型：
+
+![](pic/01.png)
+
+在编译成arm32的SO时，一定概率会被转成两个int：
+
+> long a = 0x1000L → int a1 = 0,int a2 = 0x1000
+
+在Unidbg主动调用时，一定要记得处理，否则会出问题。这是一个常见问题，JAVA层传入的时间戳,常常就是jlong：
+
+处理办法有2个：
+
+- 是按照SO的情况,传给它两个int。
+
+- 是按照传入诸如 long tm= 1621265630L的标准写法，Unidbg自动帮我们分割成两个。
