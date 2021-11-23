@@ -20,9 +20,8 @@
     - [traceWrite](#traceWrite)
   * [0x05. Unidbg使用反射补Java的类](#0x05-Unidbg使用反射补Java的类)
   * [0x06. 打开系统调用日志](#0x06-打开系统调用日志)
-  * [0x07. 加载Unidbg中不支持的SO](#0x07-加载Unidbg中不支持的SO)
-  * [0x08. 使用Unidbg打印函数参数5之后的值](#0x08-使用Unidbg打印函数参数5之后的值)
-  * [0x09. 使用Unidbg打印jobject](#0x09-使用Unidbg打印jobject)
+  * [0x07. 使用Unidbg打印函数参数5之后的值](#0x07-使用Unidbg打印函数参数5之后的值)
+  * [0x08. 使用Unidbg打印jobject](#0x08-使用Unidbg打印jobject)
 
 <!-- /code_chunk_output -->
 
@@ -586,48 +585,7 @@ public static void main(String[] args){
 
    src/test/resources/log4j.properties中**INFO**全配置成**DEBUG**
 
-### 0x07. 加载Unidbg中不支持的SO
-
-- [原文传送](https://blog.csdn.net/qq_38851536/article/details/118024298)
-
-- 查看Unidbg 支持哪些so: `unidbg-android/src/main/resources/android/sdk23/lib`
-
-  > 为什么Unidbg不内置支持所有系统SO的加载？
-  >
-  > 1. 大部分SO中主要的依赖项，就是Unidbg已经支持的这些，即已经够用了。
-  > 2. 把Android系统中全部SO都成功加载进Unidbg虚拟内存中，既是很大的工作量，又会占用过多内存。
-  > 3. 另一个原因是，比如libandroid.so，其依赖SO实在太多了，想顺利加载整个SO确确实实是个苦差事。
-
-- 如果SO的依赖项中有Unidbg不支持的系统SO，怎么办？
-
-  > 首先Unifbg会给予提示：比如libnative-lib.so load dependency libandroid.so failed
-  >
-  > 其次，尽管SO加载了Unidbg不支持的SO，但有可能我们的目标函数并没有使用到这个系统SO，这种情况下就不用理会，当作不存在就行。
-
-- 但如果目标函数使用到了这个系统SO，那就麻烦了，我们就得直面这个问题，一般有两种处理办法。
-
-  1. Patch/Hook 这个不支持的SO所使用的函数
-
-  2. 使用Unidbg VirtualModule
-
-     > VirtualModule是Unidbg为此种情况所提供的官方解决方案，并在代码中提供了两个示例，路径：unidbg-android/src/main/java/com/github/unidbg/virtualmodule/android
-
-    比如libandroid.so可以使用`AndroidModule`，只实现了libandroid中这几个常用的导出函数。
-
-  ```java
-  vm = emulator.createDalvikVM(new File("unidbg-android/src/test/java/com/lession8/demo2.apk"));
-  // 注册libandroid.so虚拟模块
-  new AndroidModule(emulator, vm).register(memory);
-  
-  DalvikModule dm = vm.loadLibrary(new File("unidbg-android/src/test/java/com/lession8/readassets.so"), true);
-  module = dm.getModule();
-  ```
-
-  需要注意，一定要在样本SO加载前加载它，道理也很简单，系统SO肯定比用户SO加载的早。VirtualModule并不是一种真正意义上的加载SO，它本质上也是Hook，只不过实现了SO中少数几个函数罢了。
-
-  需要注意的是，VirtualModule并不是一种真正意义上的加载SO，它本质上也是Hook，只不过实现了SO中少数几个函数罢了。
-
-### 0x08. 使用Unidbg打印函数参数5之后的值
+### 0x07. 使用Unidbg打印函数参数5之后的值
 
 [常见函数调用约定](https://bbs.pediy.com/thread-224583.htm)
 
@@ -660,7 +618,7 @@ size: 112
 ^-----------------------------------------------------------------------------^
 ```
 
-### 0x09. 使用Unidbg打印jobject
+### 0x08. 使用Unidbg打印jobject
 
 [原文传送](https://blog.csdn.net/qq_38851536/article/details/118122592)
 
