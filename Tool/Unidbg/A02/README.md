@@ -151,6 +151,46 @@ public void HookMDStringold() {
     }
 ```
 
+函数Hook:
+
+![](pic/02.png)
+
+```java
+    // HookZz hook Sc_EncryptWallEncode
+    public void hookEncryptWallEncode() {
+        // 获取HookZz对象，https://github.com/jmpews/HookZz
+        IHookZz hookZz = HookZz.getInstance(emulator); // 加载HookZz，支持inline hook，文档看
+        // enable hook
+        hookZz.enable_arm_arm64_b_branch(); // 测试enable_arm_arm64_b_branch
+        hookZz.wrap(module.base + 0xA284 + 1, new WrapCallback<HookZzArm32RegisterContext>() {
+            Pointer buffer;
+            @Override
+            // 方法执行前
+            public void preCall(Emulator<?> emulator, HookZzArm32RegisterContext ctx, HookEntryInfo info) {
+                System.out.println("HookZz hook EncryptWallEncode");
+                Pointer input1 = ctx.getPointerArg(0);
+                Pointer input2 = ctx.getPointerArg(1);
+                Pointer input3 = ctx.getPointerArg(2);
+                // getString的参数i代表index,即input[i:]
+                System.out.println("参数1：" + input1.getString(0));
+                System.out.println("参数2：" + input2.getString(0));
+                System.out.println("参数3：" + input3.getString(0));
+
+                buffer = ctx.getPointerArg(3);
+            }
+            @Override
+            // 方法执行后
+            public void postCall(Emulator<?> emulator, HookZzArm32RegisterContext ctx, HookEntryInfo info) {
+                // getByteArray参数1是起始index，参数2是长度，我们不知道结果多长，就先设置0x100吧
+                byte[] outputhex = buffer.getByteArray(0, 0x100);
+                Inspector.inspect(outputhex, "EncryptWallEncode output");
+            }
+        });
+        hookZz.disable_arm_arm64_b_branch();
+    }
+
+```
+
 #### HookZz--寄存器
 
 - 编写对该函数的Hook，首先因为不确定三个参数是指针还是数值，所以先全部做为数值处理，作为long类型看待，防止整数溢出
@@ -187,6 +227,10 @@ public void hook65540(){
 ```
 
 #### HookZz--InlineHook
+
+- 在有些时候，函数可能在程序中运行许多次，但我们只想观察此次此地的执行情况，那我们可能会使用inline hook，需要注意，inline hook 的时机是目标指令执行前。
+
+  ![](pic/03.png)
 
 - 通过base+offset inline wrap内部函数，在IDA看到为sub_xxx那些
 
