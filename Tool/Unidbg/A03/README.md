@@ -17,6 +17,14 @@
   * [0x03. 加载Unidbg中不支持的SO](#0x03-加载Unidbg中不支持的SO)
   * [0x04. 补系统调用](#0x04-补系统调用)
     - [getrusage](#getrusage)
+    - [popen](#popen)
+  * [0x05. 补系统属性](#0x05-补系统属性)
+    - [JNI调用](#JNI调用)
+    - [system_property_get](#system_property_get)
+    - [文件访问](#文件访问)
+    - [popen获取系统属性](#popen获取系统属性)
+    - [getenv](#getenv)
+    - [系统调用](#系统调用)
 
 <!-- /code_chunk_output -->
 
@@ -484,3 +492,642 @@ private int getrusage(Backend backend, Emulator<?> emulator){
 };
 ```
 
+#### popen
+
+popen内部实现较为复杂，调用了wait4、fork等Unidbg尚不能良好实现的系统调用。理论上有两种方法：
+
+- 那么直接Hook替换了这个函数，我们自己根据参数，返回合适的值，SystemPropertyHook不就是一个现成的例子吗？
+
+  还有点儿不太一样，SystemPropertyHook函数返回的是字符串，可以方便处理，而popen返回的是文件描述符，Unidbg中相关的实现在UnixSyscallHandler类中，使用起来好像有点儿不方便。
+
+- Unidbg提供了一种在底层修复和实现popen函数的法子。
+
+  首先我们要实现自己的ARM32SyscallHandler，完整代码如下，你可以把它当成固定讨论，它是针对popen报错的官方解决方案。
+
+  首先在hook popen的代码添加` emulator.set("command", command);`，使用emulator的全局变量，对应的yodaSyscallHandler代码，其中 *cd /system/bin && ls -l* 和 *stat /root* 的结果来自adb shell，大家根据自己的测试机情况填入合适的结果。
+
+  ```java
+  package com.lession5;
+  
+  import com.github.unidbg.Emulator;
+  import com.github.unidbg.arm.context.EditableArm32RegisterContext;
+  import com.github.unidbg.linux.ARM32SyscallHandler;
+  import com.github.unidbg.linux.file.ByteArrayFileIO;
+  import com.github.unidbg.linux.file.DumpFileIO;
+  import com.github.unidbg.memory.SvcMemory;
+  import com.sun.jna.Pointer;
+  
+  import java.util.concurrent.ThreadLocalRandom;
+  
+  class yodaSyscallHandler extends ARM32SyscallHandler {
+  
+      public yodaSyscallHandler(SvcMemory svcMemory) {
+          super(svcMemory);
+      }
+  
+  
+      @Override
+      protected boolean handleUnknownSyscall(Emulator emulator, int NR) {
+          switch (NR) {
+              case 190:
+                  vfork(emulator);
+                  return true;
+              case 114:
+                  wait4(emulator);
+                  return true;
+          }
+  
+          return super.handleUnknownSyscall(emulator, NR);
+      }
+  
+      private void vfork(Emulator<?> emulator) {
+          EditableArm32RegisterContext context = (EditableArm32RegisterContext) emulator.getContext();
+          int childPid = emulator.getPid() + ThreadLocalRandom.current().nextInt(256);
+          int r0 = childPid;
+          System.out.println("vfork pid=" + r0);
+          context.setR0(r0);
+      }
+  
+      private void wait4(Emulator emulator) {
+          EditableArm32RegisterContext context = (EditableArm32RegisterContext) emulator.getContext();
+          int pid = context.getR0Int();
+          Pointer wstatus = context.getR1Pointer();
+          int options = context.getR2Int();
+          Pointer rusage = context.getR3Pointer();
+          System.out.println("wait4 pid=" + pid + ", wstatus=" + wstatus + ", options=0x" + Integer.toHexString(options) + ", rusage=" + rusage);
+      }
+  
+      protected int pipe2(Emulator<?> emulator) {
+          EditableArm32RegisterContext context = (EditableArm32RegisterContext) emulator.getContext();
+          Pointer pipefd = context.getPointerArg(0);
+          int flags = context.getIntArg(1);
+          int write = getMinFd();
+          this.fdMap.put(write, new DumpFileIO(write));
+          int read = getMinFd();
+          String stdout = "\n";
+          // stdout中写入popen command 应该返回的结果
+          String command = emulator.get("command");
+          switch (command){
+              case "uname -a":{
+                  stdout = "Linux localhost 4.9.186-perf-gd3d6708 #1 SMP PREEMPT Wed Nov 4 01:05:59 CST 2020 aarch64\n";
+              }
+              break;
+              case "cd /system/bin && ls -l":{
+                  stdout = "total 25152\n" +
+                          "-rwxr-xr-x 1 root   shell     128688 2009-01-01 08:00 abb\n" +
+                          "lrwxr-xr-x 1 root   shell          6 2009-01-01 08:00 acpi -> toybox\n" +
+                          "-rwxr-xr-x 1 root   shell      30240 2009-01-01 08:00 adbd\n" +
+                          "-rwxr-xr-x 1 root   shell        207 2009-01-01 08:00 am\n" +
+                          "-rwxr-xr-x 1 root   shell     456104 2009-01-01 08:00 apexd\n" +
+                          "lrwxr-xr-x 1 root   shell         13 2009-01-01 08:00 app_process -> app_process64\n" +
+                          "-rwxr-xr-x 1 root   shell      25212 2009-01-01 08:00 app_process32\n"
+              }
+              break;
+              case "stat /root":{
+                  stdout = "stat: '/root': No such file or directory\n";
+              }
+              break;
+              default:
+                  System.out.println("command do not match!");
+          }
+  
+          this.fdMap.put(read, new ByteArrayFileIO(0, "pipe2_read_side", stdout.getBytes()));
+          pipefd.setInt(0, read);
+          pipefd.setInt(4, write);
+          System.out.println("pipe2 pipefd=" + pipefd + ", flags=0x" + flags + ", read=" + read + ", write=" + write + ", stdout=" + stdout);
+          context.setR0(0);
+          return 0;
+      }
+  }
+  ```
+
+  接下来让我们的emulator使用我们自己的syscallHandler，**emulator = new AndroidARMEmulator(new File("target/rootfs")); **由如下洋洋洒洒十来行取代。
+
+  ```java
+  	AndroidEmulatorBuilder builder = new AndroidEmulatorBuilder(false) {
+          public AndroidEmulator build() {
+              return new AndroidARMEmulator(processName, rootDir,
+                      backendFactories) {
+                  @Override
+                  protected UnixSyscallHandler<AndroidFileIO>
+                  createSyscallHandler(SvcMemory svcMemory) {
+                      return new yodaSyscallHandler(svcMemory);
+                  }
+              };
+          }
+      };
+      emulator = builder.setRootDir(new File("target/rootfs")).build();
+  ```
+
+### 0x05. 补系统属性
+
+[原文](https://t.zsxq.com/vb2zjEu)
+
+当认为样本可能会大量获取系统属性的时候，就可以像如下这么做，它有两个好处
+
+- 如果样本使用了它们，能被我们迅速发现。
+- 如果这些API调用过程中出了错误，报错结果可能很晦涩，典型就是popen，但我们主动Hook这些函数后，就会提前意识到是哪个函数出了问题。
+
+以下是获取系统属性常见的几种的方式，并添加对应的hook。
+
+#### JNI调用
+
+NDK中最常见的方式是通过JNI调用，比如如下代码获取SERIAL
+
+```c++
+jclass androidBuildClass = env->FindClass("android/os/Build");
+jfieldID SERIAL = env->GetStaticFieldID(androidBuildClass, "SERIAL", "Ljava/lang/String;");
+jstring serialNum = (jstring) env->GetStaticObjectField(androidBuildClass, SERIAL);
+```
+
+通过JNI调用JAVA方法获取本机的属性和信息是最常见的做法，除了Build类，常见的还有`System.getProperty`和`Systemproperties.get`等API。Unidbg补环境过程中，最好补而且不会遗漏的就是这一类，因为Unidbg会给出清楚的报错，你没法对它置之不理。
+
+#### system_property_get
+
+通过`system_property_get `函数获取系统属性，这类环境缺失`容易被忽视，因为没有日志提示`，即使src/test/resources/log4j.properties中日志全开，也不会打印相关信息。
+
+```c
+char *key = "ro.build.id";
+char value[PROP_VALUE_MAX] = {0};
+__system_property_get(key, value);
+```
+
+如何hook？该函数在libc里，实现比较复杂，但使用上又很频繁。因此Unidbg 在src/main/java/com/github/unidbg/linux/android 目录下有相关类对它进行了Hook和封装，我们可以直接拿来用。
+
+```java
+    yoda(){
+        // 创建模拟器实例，要模拟32位或者64位，在这里区分
+        emulator = AndroidEmulatorBuilder.for32Bit().build();
+        // 模拟器的内存操作接口
+        final Memory memory = emulator.getMemory();
+        // 设置系统类库解析
+        memory.setLibraryResolver(new AndroidResolver(23));
+        // 注册绑定IO重定向
+        emulator.getSyscallHandler().addIOResolver(this);
+        SystemPropertyHook systemPropertyHook = new SystemPropertyHook(emulator);
+        systemPropertyHook.setPropertyProvider(new SystemPropertyProvider() {
+            @Override
+            public String getProperty(String key) {
+                System.out.println("yoda Systemkey:"+key);
+                switch (key){
+
+                }
+                return "";
+            };
+        });
+        memory.addHookListener(systemPropertyHook);
+        // 创建Android虚拟机
+        vm = emulator.createDalvikVM(new File("unidbg-android/src/test/resources/XXX/xxx.apk"));
+        // 设置是否打印相关调用细节
+        vm.setVerbose(true);
+        // 加载so到虚拟内存，加载成功以后会默认调用init_array等函数
+        DalvikModule dm = vm.loadLibrary(new File("unidbg-android/src/test/resources/XXX/XXX.so"), true);
+        module = dm.getModule();
+        // 设置JNI
+        vm.setJni(this);
+        System.out.println("call JNIOnLoad");
+        dm.callJNI_OnLoad(emulator);
+    }
+```
+
+> 六处访问：
+>
+> lilac Systemkey:ro.kernel.qemu
+> lilac Systemkey:libc.debug.malloc
+> lilac Systemkey:ro.serialno
+> lilac Systemkey:ro.product.manufacturer
+> lilac Systemkey:ro.product.brand
+> lilac Systemkey:ro.product.model
+>
+> 系统属性获取的前两次不需要我们管，也是libc里的初始化，只需要查看后4个即可。
+
+可以通过adb shell 获取这些信息，一 一填入正确的值，建议使用Unidbg时，对应的测试机Android版本为`6.0`，这样或许可以避免潜在的麻烦。
+
+```shell
+polaris:/ $ su
+polaris:/ # getprop ro.serialno
+f8a995f5
+polaris:/ # getprop ro.product.manufacturer
+Xiaomi
+polaris:/ # getprop ro.product.brand
+Xiaomi
+polaris:/ # getprop ro.product.model
+MIX 2S
+polaris:/ #
+```
+
+```java
+emulator = builder.setRootDir(new File("target/rootfs")).build();
+final Memory memory = emulator.getMemory();
+memory.setLibraryResolver(new AndroidResolver(23
+SystemPropertyHook systemPropertyHook = new SystemPropertyHook(emulator);
+systemPropertyHook.setPropertyProvider(new SystemPropertyProvider() {
+    @Override
+    public String getProperty(String key) {
+        System.out.println("yoda Systemkey:"+key);
+        switch (key){
+            case "ro.serialno": {
+                return "HT7220201596";
+            }
+            case "ro.product.manufacturer": {
+                return "Google";
+            }
+            case "ro.product.brand": {
+                return "google";
+            }
+            case "ro.product.model": {
+                return "Pixel";
+            }
+        }
+        return "";
+    };
+});
+memory.addHookListener(systemPropertyHook);
+vm = emulator.createDalvikVM(new File("unidbg-android/src/test/java/planet/lession8/qtt_new.apk"));
+vm.setVerbose(true);
+```
+
+#### 文件访问
+
+比如读取/proc/pid/maps，此种情况，假如需要补此类环境，Unidbg会提供日志输出，不用手动输出。具体代码查看[0x02. 文件访问](#0x02-文件访问)
+
+```java
+@Override
+public FileResult resolve(Emulator emulator, String pathname, int oflags) {
+  // 把调用的路径打印出来
+	System.out.println("yoda path:" + pathname);
+	return null;
+}
+```
+
+运行代码，两处调用：
+
+> lilac path:/dev/__properties__
+>
+> lilac path:/proc/stat
+>
+> 注意: 前两个文件访问，并不需要我们管，这是libc初始化的内部逻辑，与样本无关。
+
+#### popen获取系统属性
+
+通过`popen()`管道从shell中获取系统属性，其效果可以理解成在NDK中使用adb shell，popen参数一就是shell命令，返回值是一个fd文件描述符，可以read其内容，其中内容就是adb shell执行该命令应该返回的内容。
+
+```c
+char value[PROP_VALUE_MAX] = {0};
+std::string cmd = "getprop ro.build.id";
+FILE* file = popen(cmd.c_str(), "r");
+fread(value, PROP_VALUE_MAX, 1, file);
+pclose(file);
+```
+
+`system`函数也可以做这一件事，两者在底层都依赖于execve系统调用。
+
+Hook这个函数，如果产生调用就打印日志，Unidbg Hook方案了，总体分成两派，以HookZz为代表的Hook框架，以及基于Unidbg原生Hook封装的各种Hook。我们这里选择后者，在大多数情况下我都更建议后者，因为复杂度更低，更不容易出BUG。
+
+```java
+DalvikModule dm = vm.loadLibrary(new File("unidbg-android/src/test/java/planet/lession8/libyoda.so"), true);
+module = dm.getModule();
+
+// HOOK popen
+int popenAddress = (int) module.findSymbolByName("popen").getAddress();
+// 函数原型：FILE *popen(const char *command, const char *type);
+emulator.attach().addBreakPoint(popenAddress, new BreakPointCallback() {
+    @Override
+    public boolean onHit(Emulator<?> emulator, long address) {
+        RegisterContext registerContext = emulator.getContext();
+        String command = registerContext.getPointerArg(0).getString(0);
+        System.out.println("lilac popen command:"+command);
+        emulator.set("command", command);
+        return true;
+    }
+});
+
+vm.setJni(this);
+System.out.println("call JNIOnLoad");
+dm.callJNI_OnLoad(emulator);
+```
+
+addBreakPoint 我们一般用于下断点，添加回调，在命中断点时打印输出popen的参数1(即传给shell的命令)，并设置返回值为true，即做完打印程序继续跑，不用真断下来。通过它发现样本在通过popen执行uname -a等命令，`uname -a `返回的是一些系统信息，其实内容就是系统调用uname返回的那些。
+
+```shell
+polaris:/ # uname -a
+Linux localhost 4.9.186-perf-gd3d6708 #1 SMP PREEMPT Wed Nov 4 01:05:59 CST 2020 aarch64
+```
+
+但接下来有两个大问题在等着我们，思考一下
+
+- 我们的HOOK时机够早吗？这个样本的popen调用发生在目标函数中，如果发生在init中呢？
+- 我们通过HOOK得到了其参数，那怎么给它返回正确的值呢？
+
+先考虑第一个问题，我们现在的HOOK时机是Loadlibrary之后，JNIOnLoad之前，如果SO存在init_proc函数，或者init_array非空，都会在Loadlibrary的过程中执行，我们的时机晚于这些初始化函数，这是绝对不能接受的。
+
+我们需要在Loadlibrary前面开始Hook，为了实现这个目标，我们提前将libc加载进Unidbg内存中，看一下完整代码：
+
+但它并非好无副作用，我们的样本SO的基地址就并非`0x40000000`了，做算法分析时需要注意一下。
+
+```java
+vm = emulator.createDalvikVM(new File("unidbg-android/src/test/java/planet/lession8/xxx.apk"));
+vm.setVerbose(true);
+
+DalvikModule dmLibc = vm.loadLibrary(new File("unidbg-android/src/main/resources/android/sdk23/lib/libc.so"), true);
+Module moduleLibc = dmLibc.getModule();
+
+// HOOK popen
+int popenAddress = (int) moduleLibc.findSymbolByName("popen").getAddress();
+// 函数原型：FILE *popen(const char *command, const char *type);
+emulator.attach().addBreakPoint(popenAddress, new BreakPointCallback() {
+    @Override
+    public boolean onHit(Emulator<?> emulator, long address) {
+        RegisterContext registerContext = emulator.getContext();
+        String command = registerContext.getPointerArg(0).getString(0);
+        System.out.println("lilac popen command:"+command);
+        emulator.set("command", command);
+        return true;
+    }
+});
+
+// 加载so到虚拟内存，加载成功以后会默认调用init_array等函数
+DalvikModule dm = vm.loadLibrary(new File("unidbg-android/src/test/java/planet/lession8/xxx.so"), true);
+module = dm.getModule();
+
+// 设置JNI
+vm.setJni(this);
+System.out.println("call JNIOnLoad");
+dm.callJNI_OnLoad(emulator);
+```
+
+具体补的细节[popen](#popen)
+
+#### getenv
+
+通过`getenv`函数获取进程环境变量。Android系统层面存在一些默认的环境变量，样本可以设置自己进程内的环境变量。因此，样本可以在Native层获取系统环境变量或者自身JAVA层设置的环境变量。
+
+> getenv()用来取得环境变量的内容。参数为环境变量的名称，如果该变量存在则会返回指向该内容的指针，如果不存在则返回null。
+
+我们可以通过ADB 查看环境变量有哪些，也可以查看环境变量的值。
+
+```
+adb shell
+sailfish:/system/bin # export
+ANDROID_ASSETS
+ANDROID_BOOTLOGO
+ANDROID_DATA
+ANDROID_ROOT
+ANDROID_SOCKET_adbd
+ANDROID_STORAGE
+ASEC_MOUNTPOINT
+BOOTCLASSPATH
+DOWNLOAD_CACHE
+EXTERNAL_STORAGE
+HOME
+HOSTNAME
+LOGNAME
+PATH
+SHELL
+SYSTEMSERVERCLASSPATH
+TERM
+TMPDIR
+USER
+_
+sailfish:/system/bin # echo $ANDROID_ASSETS
+/system/app
+```
+
+案列SO：
+
+作用就是查看系统环境变量PATH的值。
+
+<img src="pic/07.png" style="zoom:50%;" />
+
+Unidbg：
+
+```java
+    public void call() {
+        List<Object> list = new ArrayList<>(10);
+        list.add(vm.getJNIEnv());
+        list.add(0);
+        Number number = module.callFunction(emulator, 0x7f1, list.toArray())[0];
+        System.out.println("result:"+vm.getObject(number.intValue()).getValue().toString());
+    }
+```
+
+报错：
+
+<img src="pic/08.png" style="zoom:50%;" />
+
+getValue取不到结果，原因就是getenv没有返回值，那么该怎么办呢？这里给env返回正确的值有几种办法呢？
+
+- 方法一
+
+  Unidbg提供了对环境变量的初始化，它在src/main/java/com/github/unidbg/linux/AndroidElfLoader.java中。
+
+  <img src="pic/09.png" style="zoom:50%;" />
+
+  直接填上就可以了：
+
+  ```java
+  this.environ = initializeTLS(new String[] {
+          "ANDROID_DATA=/data",
+          "ANDROID_ROOT=/system",
+          "PATH=1",
+  });
+  ```
+
+- 方法二
+
+  libc 提供了setenv方法，可以设置环境变量。
+
+  ```java
+     public static void main(String[] args) {
+          getPath demo = new getPath();
+          demo.setEnv();
+      }
+  
+      // setenv设置环境变量
+      public void setEnv(){
+          Symbol setenv = module.findSymbolByName("setenv", true);
+          setenv.call(emulator, "PATH", "2", 0);
+      };
+  ```
+
+- 方法三
+
+  我们也可以通过HookZz hook函数，替换结果
+
+  ```java
+  public void hookgetEnvByHookZz(){
+          IHookZz hookZz = HookZz.getInstance(emulator);
+  
+          hookZz.wrap(module.findSymbolByName("getenv"), new WrapCallback<EditableArm32RegisterContext>() {
+              String name;
+              @Override
+              public void preCall(Emulator<?> emulator, EditableArm32RegisterContext ctx, HookEntryInfo info){
+                  name = ctx.getPointerArg(0).getString(0);
+              }
+              @Override
+              public void postCall(Emulator<?> emulator, EditableArm32RegisterContext ctx, HookEntryInfo info) {
+                  switch (name){
+                      case "PATH":{
+                          // 申请内存
+                          MemoryBlock replaceBlock = emulator.getMemory().malloc(0x100, true);
+                          // 获取内存指针
+                          UnidbgPointer replacePtr = replaceBlock.getPointer();
+                          String pathValue = "3";
+                          // 往内存里写值
+                          replacePtr.write(0, pathValue.getBytes(StandardCharsets.UTF_8), 0, pathValue.length());
+                          // 为r0寄存器设置值
+                          ctx.setR0(replacePtr.toIntPeer());
+                      }
+                  }
+              }
+          });
+      };
+  ```
+
+- 方法四
+
+  通过断点的方式hook
+
+  ```java
+  public void hookgetEnvByBreakPointer(){
+          emulator.attach().addBreakPoint(module.base + 0x7FE, new BreakPointCallback() {
+              @Override
+              public boolean onHit(Emulator<?> emulator, long address) {
+                  EditableArm32RegisterContext registerContext = emulator.getContext();
+                  registerContext.getPointerArg(0).setString(0, "4");
+                  emulator.getBackend().reg_write(ArmConst.UC_ARM_REG_PC, (address)+5);
+                  return true;
+              }
+          });
+      }
+  ```
+
+  我们直接让R0指针指向正确的值，并操纵PC寄存器跳过这条指令
+
+  <img src="pic/10.png" style="zoom:50%;" />
+
+  这条指令四个字节长度，又因为thumb模式+1，所以address+5。
+
+- 方法五
+
+  仿照SystemPropertyHook写一下，代码如下
+
+  ```java
+  package com.envget;
+  
+  import com.github.unidbg.Emulator;
+  import com.github.unidbg.arm.ArmHook;
+  import com.github.unidbg.arm.HookStatus;
+  import com.github.unidbg.arm.context.RegisterContext;
+  import com.github.unidbg.hook.HookListener;
+  import com.github.unidbg.memory.SvcMemory;
+  import com.github.unidbg.pointer.UnidbgPointer;
+  
+  public class EnvHook implements HookListener {
+  
+      private final Emulator<?> emulator;
+  
+      public EnvHook(Emulator<?> emulator) {
+          this.emulator = emulator;
+      }
+  
+      @Override
+      public long hook(SvcMemory svcMemory, String libraryName, String symbolName, final long old) {
+          if ("libc.so".equals(libraryName) && "getenv".equals(symbolName)) {
+              if (emulator.is32Bit()) {
+                  return svcMemory.registerSvc(new ArmHook() {
+                      @Override
+                      protected HookStatus hook(Emulator<?> emulator) {
+                          return getenv(old);
+                      }
+                  }).peer;
+              }
+          }
+          return 0;
+      }
+  
+      private HookStatus getenv(long old) {
+          RegisterContext context = emulator.getContext();
+          UnidbgPointer pointer = context.getPointerArg(0);
+          String key = pointer.getString(0);
+          switch (key){
+              case "PATH":{
+                  pointer.setString(0, "5");
+                  return HookStatus.LR(emulator, pointer.peer);
+              }
+          }
+          return HookStatus.RET(emulator, old);
+      }
+  }
+  ```
+
+  ```java
+  package com.envget;
+  
+  import com.github.unidbg.AndroidEmulator;
+  import com.github.unidbg.Module;
+  import com.github.unidbg.linux.android.AndroidEmulatorBuilder;
+  import com.github.unidbg.linux.android.AndroidResolver;
+  import com.github.unidbg.linux.android.dvm.AbstractJni;
+  import com.github.unidbg.linux.android.dvm.DalvikModule;
+  import com.github.unidbg.linux.android.dvm.VM;
+  import com.github.unidbg.memory.Memory;
+  
+  import java.io.File;
+  import java.util.ArrayList;
+  import java.util.List;
+  
+  public class getPath extends AbstractJni {
+      private final AndroidEmulator emulator;
+      private final VM vm;
+      private final Module module;
+  
+  
+      getPath(){
+          // 创建模拟器实例，要模拟32位或者64位，在这里区分
+          emulator = AndroidEmulatorBuilder.for32Bit().build();
+        
+          // 模拟器的内存操作接口
+          final Memory memory = emulator.getMemory();
+          // 设置系统类库解析
+          memory.setLibraryResolver(new AndroidResolver(23));
+        
+          // 创建Android虚拟机
+          vm = emulator.createDalvikVM();
+          // 设置是否打印相关调用细节
+          vm.setVerbose(true);
+  
+          EnvHook envHook = new EnvHook(emulator);
+          memory.addHookListener(envHook);
+  
+          // 加载so到虚拟内存，加载成功以后会默认调用init_array等函数
+          DalvikModule dm = vm.loadLibrary(new File("unidbg-android/src/test/resources/envget/libenvget.so"), true);
+          module = dm.getModule();
+          // 设置JNI
+          vm.setJni(this);
+          System.out.println("call JNIOnLoad");
+          dm.callJNI_OnLoad(emulator);
+      }
+  }
+  ```
+
+#### 系统调用
+
+使用系统调用获取相关属性，不管是通过syscall函数还是内联汇编，都属此类。
+
+常见的比如uname系统调用：日志全开的情况下，系统调用的相关调用会被全部打印，仔细一些就没什么问题。
+
+> uname - 获取当前内核的名称和信息
+>
+> 返回的信息是一个结构体
+>
+> ```c
+> struct utsname {
+>    char sysname[];    /* 操作系统名称 (例如 "Linux") */
+>    char nodename[];   /* "一些实现了的网络”内的名称*/
+>    char release[];    /* 操作系统版本 (例如 "2.6.28")*/
+>    char version[];    /* 操作系统发布日期 */
+>    char machine[];    /* 硬件标识符 */
+>    char domainname[]; /* NIS或YP域名 */
+> };
+> ```
