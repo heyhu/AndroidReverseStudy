@@ -16,6 +16,7 @@
     * [代码方式](#代码方式)
   * [0x03. 加载Unidbg中不支持的SO](#0x03-加载Unidbg中不支持的SO)
   * [0x04. 补系统调用](#0x04-补系统调用)
+    - [getrusage](#getrusage)
 
 <!-- /code_chunk_output -->
 
@@ -404,7 +405,7 @@ VarArg varArg) {
 
 目标函数
 
-![](pic\05.png)
+![](pic/05.png)
 
 getrusage 是libc里的库函数，它用于查看进程的资源消耗情况。每个进程都会消耗诸如内存和 CPU 时间之类的系统资源。该函数允许一个进程监控自己及其子进程已经用掉的资源。
 
@@ -464,7 +465,7 @@ ARM32SyscallHandler中的日志一定要重视，它代表了系统调用方面�
 
 NR=77即系统调用号下77，在网站中查一下是哪个系统调用[Chromium OS Docs - Linux System Call Table (googlesource.com)](https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md#arm-32_bit_EABI)，77正好是getrusage。DEMO里我们没用系统调用啊，分析SO发现getrusage是导入函数，在libc里，这儿怎么又成了系统调用了呢？事实上，一部分libc里的函数，只是对系统调用的简单封装，比如getrusage函数，libc中的代码，就是简单封装罢了，因此我们使用getrusage相当于间接用了系统调用。而我们的Unidbg中没有实现这个系统调用：
 
-<img src="pic\06.png" style="zoom:50%;" />
+<img src="pic/06.png" style="zoom:50%;" />
 
 做一个简单实现，对于who，即读取模式（主进程、子进程、线程等）情形，没做分门别类的处理，其次，我们也没用给usage结构体的每个内容适合的返回值，只将ru_utime 的结构体 设置成了1秒，0x10000毫秒，其余都没有做处理，即都默认0，这是不合适的。在真实样本中，建议Frida hook 真实的、样本返回的usage结构体信息，填入此函数中。
 
