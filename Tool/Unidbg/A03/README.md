@@ -15,7 +15,7 @@
     * [实体路径](#实体路径)
     * [代码方式](#代码方式)
   * [0x03. 加载Unidbg中不支持的SO](#0x03-加载Unidbg中不支持的SO)
-  * 
+  * [0x04. 补系统调用](#0x04-补系统调用)
 
 <!-- /code_chunk_output -->
 
@@ -319,6 +319,8 @@ VarArg varArg) {
 
 接下来我们按照要求，在data目录下新建对应文件夹`/data/app/com.sankuai.meituan-TEfTAIBttUmUzuVbwRK1DQ==`，并把我们的apk复制进去，改名成base.apk，就可以了。[原文传送](https://blog.csdn.net/qq_38851536/article/details/118000259)
 
+或者使用虚拟文件系统，将样本中对Android文件系统的访问重定位到本机电脑的某个目录或者叫文件夹，按照Android系统中的层级关系将文件放到这个文件夹里就可以了。初始化模拟器中的 **setRootDir(new File("target/rootfs"))** 是指定当前项目的文件系统位置，运 行测试你会在Unidbg目录中看到它。假设要访问tmp/a.txt，你可以将电脑里的a.txt 通过adb pull 出来，然后放在target/rootfs/tmp下，Unidbg即可完成该样本中对该文件的访问。
+
 #### 代码方式
 
 1. public class NBridge extends AbstractJni implements IOResolver 
@@ -393,4 +395,91 @@ VarArg varArg) {
   需要注意，一定要在样本SO加载前加载它，道理也很简单，系统SO肯定比用户SO加载的早。VirtualModule并不是一种真正意义上的加载SO，它本质上也是Hook，只不过实现了SO中少数几个函数罢了。
 
   需要注意的是，VirtualModule并不是一种真正意义上的加载SO，它本质上也是Hook，只不过实现了SO中少数几个函数罢了。
+
+### 0x04. 补系统调用
+
+#### getrusage
+
+[原文](https://t.zsxq.com/faQbqjm)
+
+目标函数
+
+![](pic\05.png)
+
+getrusage 是libc里的库函数，它用于查看进程的资源消耗情况。每个进程都会消耗诸如内存和 CPU 时间之类的系统资源。该函数允许一个进程监控自己及其子进程已经用掉的资源。
+
+函数定义：`int getrusage(int who, struct rusage *usage);`
+
+它有两个入参，先说参数1，参数1有四个可选的值:
+
+```c
+#define RUSAGE_SELF 0   当前进程
+#define RUSAGE_CHILDREN (- 1)  所有子进程
+#define RUSAGE_BOTH (- 2)  当前进程+所有子进程 
+#define RUSAGE_THREAD 1  线程
+```
+
+参数2是一个指向 rusage 结构的指针，资源消耗情况返回到该指针指向的结构体:
+
+```
+struct rusage {
+    struct timeval ru_utime; /* user CPU time used */          返回进程在用户模式下的执行时间
+    struct timeval ru_stime; /* system CPU time used */        返回进程在内核模式下的执行时间
+    long   ru_maxrss;        /* maximum resident set size */
+    long   ru_ixrss;         /* integral shared memory size */
+    long   ru_idrss;         /* integral unshared data size */
+    long   ru_isrss;         /* integral unshared stack size */
+    long   ru_minflt;        /* page reclaims (soft page faults) */
+    long   ru_majflt;        /* page faults (hard page faults) */
+    long   ru_nswap;         /* swaps */
+    long   ru_inblock;       /* block input operations */
+    long   ru_oublock;       /* block output operations */
+    long   ru_msgsnd;        /* IPC messages sent */
+    long   ru_msgrcv;        /* IPC messages received */
+    long   ru_nsignals;      /* signals received */
+    long   ru_nvcsw;         /* voluntary context switches */
+    long   ru_nivcsw;        /* involuntary context switches */
+};
+```
+
+ru_utime：返回进程在用户模式下的执行时间，以timeval结构的形式返回,timeval一般长这样:
+
+```
+struct timeval {
+  long tv_sec;    // 秒
+  long tv_usec;   // 微妙
+};
+```
+
+至于函数的返回值，执行成功返回0，发生错误返回 -1。
+
+程序报错：
+
+ARM32SyscallHandler中的日志一定要重视，它代表了系统调用方面所发生的调用或者错误。
+
+```java
+[10:19:59 730]  WARN [com.github.unidbg.linux.ARM32SyscallHandler] (ARM32SyscallHandler:469) - handleInterrupt intno=2, NR=77, svcNumber=0x0, PC=RX@0x400e5088[libc.so]0x41088, LR=RX@0x400007cb[libnative-lib.so]0x7cb, syscall=null
+1074392424
+```
+
+NR=77即系统调用号下77，在网站中查一下是哪个系统调用[Chromium OS Docs - Linux System Call Table (googlesource.com)](https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md#arm-32_bit_EABI)，77正好是getrusage。DEMO里我们没用系统调用啊，分析SO发现getrusage是导入函数，在libc里，这儿怎么又成了系统调用了呢？事实上，一部分libc里的函数，只是对系统调用的简单封装，比如getrusage函数，libc中的代码，就是简单封装罢了，因此我们使用getrusage相当于间接用了系统调用。而我们的Unidbg中没有实现这个系统调用：
+
+<img src="pic\06.png" style="zoom:50%;" />
+
+做一个简单实现，对于who，即读取模式（主进程、子进程、线程等）情形，没做分门别类的处理，其次，我们也没用给usage结构体的每个内容适合的返回值，只将ru_utime 的结构体 设置成了1秒，0x10000毫秒，其余都没有做处理，即都默认0，这是不合适的。在真实样本中，建议Frida hook 真实的、样本返回的usage结构体信息，填入此函数中。
+
+```java
+private static final int RUSAGE_SELF = 0;
+private static final int RUSAGE_CHILDREN = -1;
+private static final int RUSAGE_BOTH = -2;
+private static final int RUSAGE_THREAD = 1;
+
+private int getrusage(Backend backend, Emulator<?> emulator){
+    int who = backend.reg_read(ArmConst.UC_ARM_REG_R0).intValue();
+    Pointer usage = UnidbgPointer.register(emulator, ArmConst.UC_ARM_REG_R1);
+    usage.setLong(0, 1);
+    usage.setLong(8,0x10000);
+    return 0;
+};
+```
 
