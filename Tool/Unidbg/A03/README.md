@@ -343,7 +343,7 @@ VarArg varArg) {
        public FileResult resolve(Emulator emulator, String pathname, int oflags) {
            if (("proc/"+emulator.getPid()+"/cmdline").equals(pathname)) {
                // 填入想要重定位的文件
-               return FileResult.success(new SimpleFileIO(oflags, newFile("D:\\unidbg-teach\\unidbg-android\\src\\test\\java\\com\\lession1\\cmdline"), pathname));
+               return FileResult.success(new SimpleFileIO(oflags, new File("D:\\unidbg-teach\\unidbg-android\\src\\test\\java\\com\\lession1\\cmdline"), pathname));
            }
            return null;
        }
