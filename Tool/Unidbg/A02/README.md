@@ -121,7 +121,23 @@ Unidbg提供了`两种`方法打Patch，简单的需求可以调用Unicorn对虚
           });
       }
   ```
-
+  
+  ```java
+      public void hookonegetstring() {
+          emulator.attach().addBreakPoint(module.base + 0x51e51, new BreakPointCallback() {
+              @Override
+              public boolean onHit(Emulator<?> emulator, long address) {
+                  String input = "d7b7d042-d4f2-4012-be60-d97ff2429c17";
+                  MemoryBlock replaceBlock = emulator.getMemory().malloc(input.length(), true);
+                  replaceBlock.getPointer().write(input.getBytes(StandardCharsets.UTF_8));
+                  // 修改r0为指向新字符串的新指针
+                  emulator.getBackend().reg_write(ArmConst.UC_ARM_REG_R0, replaceBlock.getPointer().peer);
+                  emulator.getBackend().reg_write(ArmConst.UC_ARM_REG_PC, address + 3);
+                  return true;
+              }
+          });
+      }
+  ```
 
 ### 0x02. Hook
 
