@@ -47,7 +47,7 @@
 - [03.安卓so基本动态调试](Android/A03/README.md)
 - [04.安卓so每种哈希函数的特征](Android/A04/README.md)
 - [05.对称加密之DES](Android/A05/README.md)
-- [06.对称加密之AES]((Android/A06/README.md))
+- [06.对称加密之AES](Android/A06/README.md)
 
 ## B.安卓源码编译
 - [01.AOSP源码编译7.1.2_r8](Android/B01/README.md)
