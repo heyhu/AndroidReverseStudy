@@ -334,7 +334,7 @@ VarArg varArg) {
 
 1. public class NBridge extends AbstractJni implements IOResolver 
 
-2. emulator.getSyscallHandler().addIOResolver(this)
+2. emulator.getSyscallHandler().addIOResolver(this) so加载前添加文件重定位器
 
 3. 
 
