@@ -122,13 +122,27 @@ typedef struct SHA1Context
 
 选中参数类型`int`右键点击`convert to struct *`，可以看到里面没有我们想转换的，需要手动导入，编辑添加到ida环境里。
 
-view -> open subviews -> local types -> 空白点击insert。导入之后选中参数类型右键点击 convert to struct 选择你刚插入的结构体。
+view -> open subviews -> local types -> 空白点击insert。
 
-效果如下：
+导入之后选中参数类型右键点击 convert to struct 选择你刚插入的结构体。效果如下，可以看到和源码没有什么差别。
 
 ![](pic/02.b.png)
 
-可以看到和源码没有什么差别。
+或者选中变量右键`set lvar type`声明结构体。
+
+![](pic/03.a.png)
+
+![](pic/03.b.png)
+
+![](pic/03.c.png)
+
+![](pic/03.d.png)
+
+![](pic/03.e.png)
+
+结果如下：
+
+![](pic/03.f.png)
 
 有时候结构体导入存在依赖关系导入失败，比如想导入evp_md_ctx_st，但是它和evp_md_st存在着依赖关系，这就需要导入头文件openssl.h，如jni.h一样导入进去，file -> load file -> Parse C header file。
 
