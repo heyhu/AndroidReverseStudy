@@ -10,7 +10,7 @@ $ hook的时机：有的方法是oncreate方法app初始化执行的，所以用
 
 1. plugin load
     1. objection -g com.app.name explore -P ~/.objection/plugins
-    2. plugin load /Users/zhaoshouxin/code/Wallbreaker
+    2. plugin load /Users/xxx/code/Wallbreaker
     
 2. Options：
 
