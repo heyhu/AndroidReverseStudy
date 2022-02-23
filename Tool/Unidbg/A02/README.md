@@ -333,6 +333,29 @@ debugger.addBreakPoint(module.base + 0x1ecc + 1);
 5. 基于Unicorn的Console Debugger同样不用因为thumb模式+1，会自己做转换。
 ```
 
+```java
+ // 程序中下断点
+public void HookMemcmp(){
+  emulator.attach().addBreakPoint(module.findSymbolByName("memcmp").getAddress(), new BreakPointCallback() 				{
+    @Override
+    public boolean onHit(Emulator<?> emulator, long address) {
+      System.out.println("call memcmp 作比较");
+      RegisterContext registerContext = emulator.getContext();
+      UnidbgPointer arg1 = registerContext.getPointerArg(0);
+      UnidbgPointer arg2 = registerContext.getPointerArg(1);
+      int size = registerContext.getIntArg(2);
+      Inspector.inspect(arg1.getByteArray(0, size), "arg1");
+      Inspector.inspect(arg2.getByteArray(0, size), "arg2");
+
+      if(arg1.getString(0).equals("Context")){
+        emulator.attach().debug();
+      }
+      return true;
+    }
+  });
+}
+```
+
 ### 0x03. 主动调用
 
 #### 使用原生函数
