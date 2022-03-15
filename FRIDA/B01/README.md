@@ -1,6 +1,7 @@
 #### Hook Java
 
 1. [案例: 密码内存爆破, 输出bytes数组, bytesToString](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/pass_invoke.js)
+   
    ![](pic/01.a.png)
    
    ```js
@@ -19,16 +20,16 @@
     };   
    ```
    
-3. [构造一个字符串](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L23)
-   
+2. [构造一个字符串](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L23)
+
    ```
    Java.use('Java.lang.String').$new('aaa')
    含义：.$new 使用构造方法创建实例
    注：如果字符串为$new生成出来的，则可以调用java层string类的方法。
    ```
-   
-4. [查找实例进行主动调用](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L83)
-   
+
+3. [查找实例进行主动调用](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L83)
+
    ```
    java 方法分静态和动态，带static的方法可以直接调用，否则需要实例, 注意时机！一般不能用spwan。
    Java.choose的使用, 原型：Java.choose(className, callbacks)
@@ -45,9 +46,9 @@
          )
    注意：类名为string -> 'com.Tester.Mtop.a'
    ```
-   
-5. [内部变量赋值修改](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L45)
-    
+
+4. [内部变量赋值修改](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L45)
+
    ```
    var a = Java.use("com.android.okhttp.okio.ByteString");
    static value_a = false //属性
@@ -57,10 +58,10 @@
    静态成员可以直接设置结果： a.value_a.value = true;
    动态成员需要找到实例： instance_a.value_b.value = true; 
    如果方法属性同在，直接调用的是方法，想调用属性的话，前面加下划线：instance_a._value_c.value = true;
-    ```
-    
-6. [查找内部类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L65)
-   
+   ```
+
+5. [查找内部类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L65)
+
    ```
     内部的a方法怎么用frida hook到 ?
     1. 用jadx看smali，内部类是有个分配给他的类似$a的名字的；
@@ -68,16 +69,16 @@
    ```
    ![](pic/01.b.png)   
    innerClass是activity4的内部类。   
-   
-7. [getDeclaredMethods](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L67)
-   
+
+6. [getDeclaredMethods](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L67)
+
    ```
    获取本类中的所有方法，包括私有的(private、protected、默认以及public)的方法。
    ```
-  ![](pic/01.c.png)   
-  
-8. [枚举所有classLoader, 找到要hook的类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L90)
-   
+     ![](pic/01.c.png)   
+
+7. [枚举所有classLoader, 找到要hook的类](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L90)
+
    ```
     1. 只有找到类对应的loader，才能找到这个类以及hook对应的方法。
     2. 类是怎么加载到java虚拟机并执行？
@@ -89,9 +90,9 @@
        loadClass()：此方法支持重载，目的是获取加载类的类对象。
        resolveClass()：实现让JVM链接这个类，此方法调用的是本地方法，不能重载。
    ```
-   
-9. [enumerateLoadedClasses](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L117)
-   
+
+8. [enumerateLoadedClasses](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L117)
+
    ```
     枚举所有已加载的类，enumerateLoadedClasses, 过滤出自己想要的类名。
     笨方法：
@@ -104,27 +105,27 @@
     }
    ```
    ![](pic/01.d.png)  
-   
-10. hook all interface
-    ```
-    public class milk implements liquid {
-    implements //就是接口的意思。关键字，implements是一个类，实现一个接口用的关键字，它是用来实现接口中定义的抽象方法。实现一个接口，必须实现接口中的所有方法。
-    ```
-    ![](pic/01.e.png)  
 
-11. 如果一个类想hook，但是类/函数没有import，可以看它的smali文件，找到相应的信息
+9. hook all interface
+   ```
+   public class milk implements liquid {
+   implements //就是接口的意思。关键字，implements是一个类，实现一个接口用的关键字，它是用来实现接口中定义的抽象方法。实现一个接口，必须实现接口中的所有方法。
+   ```
+   ![](pic/01.e.png)  
+
+10. 如果一个类想hook，但是类/函数没有import，可以看它的smali文件，找到相应的信息
     ```
     Java.lang.System 就是System的类名。
     ```
     ​    ![](pic/01.f.png)  
 
-12. 资源文件的读取     
+11. 资源文件的读取     
     ![](pic/01.g.png)
-    
+
      找到对应的资源文件：
-    
+
     ![](pic/01.h.png)      
-    
+
 12. hook构造函数    
      ```
      构造函数：是一种特殊的方法。
