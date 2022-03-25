@@ -6,18 +6,20 @@
    
    ```js
     // ByteString.of是用来把byte[]数组转成hex字符串的函数, Android系统自带ByteString类
-    var ByteString = Java.use("com.android.okhttp.okio.ByteString");
-    var j = Java.use("c.business.comm.j");
-    j.x.implementation = function() {
-        var result = this.x();
-        console.log("j.x:", ByteString.of(result).hex());
-        return result;
-    };
-    
-    j.a.overload('[B').implementation = function(bArr) {
-        this.a(bArr);
-        console.log("j.a:", ByteString.of(bArr).hex());
-    };   
+   function hookSign() {
+       Java.perform(function () {
+           var NativeApi = Java.use('com.weibo.xvideo.NativeApi');
+           // 使用系统工具类将byte数组转成hex、utf8.
+           var ByteString = Java.use("com.android.okhttp.okio.ByteString");
+           NativeApi.s.implementation = function (str1, str2) {
+               var result = this.s(str1, str2);
+               console.log("str:" + ByteString.of(str1).utf8())
+               console.log("hex:" + ByteString.of(str1).hex())
+               console.log(result);
+               return result;
+           }
+       });
+   } 
    ```
    
 2. [构造一个字符串](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L23)
@@ -234,174 +236,4 @@
      很多对象都可以用 .toString() 来打印字符串
      ```
 
-24. hook方法的所有重载
-     ```js
-     //目标类
-     var hook = Java.use(targetClass);
-     //重载次数
-     var overloadCount = hook[targetMethod].overloads.length;
-     //打印日志：追踪的方法有多少个重载
-     console.log("Tracing " + targetClassMethod + " [" + overloadCount + " overload(s)]");
-     //每个重载都进入一次
-     for (var i = 0; i < overloadCount; i++) {
-     //hook每一个重载
-         hook[targetMethod].overloads[i].implementation = function() {
-             console.warn("\n*** entered " + targetClassMethod);
-     
-             //可以打印每个重载的调用栈，对调试有巨大的帮助，当然，信息也很多，尽量不要打印，除非分析陷入僵局
-             Java.perform(function() {
-                  var bt = Java.use("android.util.Log").getStackTraceString(Java.use("java.lang.Exception").$new());
-                     console.log("\nBacktrace:\n" + bt);
-             });   
-     
-             // 打印参数
-             if (arguments.length) console.log();
-             for (var j = 0; j < arguments.length; j++) {
-                 console.log("arg[" + j + "]: " + arguments[j]);
-             }
-     
-             //打印返回值
-             var retval = this[targetMethod].apply(this, arguments); // rare crash (Frida bug?)
-             console.log("\nretval: " + retval);
-             console.warn("\n*** exiting " + targetClassMethod);
-             return retval;
-         }
-     }
-     ```
-
-25. hook类的所有方法
-     ```js
-      function traceClass(targetClass)
-         {
-           //Java.use是新建一个对象哈，大家还记得么？
-             var hook = Java.use(targetClass);
-           //利用反射的方式，拿到当前类的所有方法
-             var methods = hook.class.getDeclaredMethods();
-           //建完对象之后记得将对象释放掉哈
-             hook.$dispose;
-           //将方法名保存到数组中
-             var parsedMethods = [];
-             methods.forEach(function(method) {
-                 parsedMethods.push(method.toString().replace(targetClass + ".", "TOKEN").match(/\sTOKEN(.*)\(/)[1]);
-             });
-           //去掉一些重复的值
-             var targets = uniqBy(parsedMethods, JSON.stringify);
-           //对数组中所有的方法进行hook，traceMethod也就是第一小节的内容
-             targets.forEach(function(targetMethod) {
-                 traceMethod(targetClass + "." + targetMethod);
-             });
-         }
-     ```
-
-####   JAVA api
-
-1. hook类的所有子类
-
-    ```js
-     //枚举所有已经加载的类
-    Java.enumerateLoadedClasses({
-        onMatch: function(aClass) {
-            //迭代和判断
-            if (aClass.match(pattern)) {
-                //做一些更多的判断，适配更多的pattern
-                var className = aClass.match(/[L]?(.*);?/)[1].replace(/\//g, ".");
-                //进入到traceClass里去
-                traceClass(className);
-            }
-        },
-        onComplete: function() {}
-    });Hook Java
-    ```
-
-2. Java.available
-
-    ```
-        // 该函数一般用来判断当前进程是否加载了JavaVM，Dalvik或ART虚拟机
-        function frida_Java() {
-            Java.perform(function () {
-                //作为判断用
-                if(Java.available)
-                {
-                    //注入的逻辑代码
-                    console.log("hello java vm");
-                }else{
-                    //未能正常加载JAVA VM
-                    console.log("error");
-                }
-            });
-        }       
-        setImmediate(frida_Java,0);
-        
-        输出如下。
-        hello java vm
-        核心注入的逻辑代码写在<注入的逻辑代码>内会非常的安全万无一失~ 
-       
-    ```
-
-3. Java.androidVersion     
-    ```
-    // 显示android系统版本号
-    function frida_Java() {
-        Java.perform(function () {
-            //作为判断用
-            if(Java.available)
-            {
-                //注入的逻辑代码
-                console.log("",Java.androidVersion);
-            }else{
-                //未能正常加载JAVA VM
-                console.log("error");
-            }
-        });
-    }       
-    setImmediate(frida_Java,0);
-    
-    输出如下。
-    9 ,因为我的系统版本是9版本~  
-    
-    ```
-
-4. 获取类Java.use 
-    ```js
-     // Java.use(className)，动态获取className的类定义，通过对其调用$new()来调用构造函数，可以从中实例化对象。当想要回收类时可以调用$Dispose()方法显式释放，当然也可以等待JavaScript的垃圾回收机制，当实例化一个对象之后，可以通过其实例对象调用类中的静态或非静态的方法，官方代码示例定义如下。
-    
-    Java.perform(function () {
-      //获取android.app.Activity类
-      var Activity = Java.use('android.app.Activity');
-      //获取java.lang.Exception类
-      var Exception = Java.use('java.lang.Exception');
-      //拦截Activity类的onResume方法
-      Activity.onResume.implementation = function () {
-        //调用onResume方法的时候，会在此处被拦截并且调用以下代码抛出异常！
-        throw Exception.$new('Oh noes!');
-      };
-    });
-    ```
-
-5. Java.vm对象
-    ```js
-     //Java.vm对象十分常用，比如想要拿到JNI层的JNIEnv对象，可以使用getEnv()；我们来看看具体的使用和基本小实例。~
-    
-    function frida_Java() {     
-        Java.perform(function () {
-             //拦截getStr函数
-             Interceptor.attach(Module.findExportByName("libhello.so" , "Java_com_roysue_roysueapplication_hellojni_getStr"), {
-                onEnter: function(args) {
-                    console.log("getStr");
-                },
-                onLeave:function(retval){
-                    //它的返回值的是retval 在jni层getStr的返回值的jstring 
-                    //我们在这里做的事情就是替换掉结果
-                    //先获取一个Env对象
-                    var env = Java.vm.getEnv();
-                    //通过newStringUtf方法构建一个jstirng字符串
-                    var jstring = env.newStringUtf('roysue');
-                    //replace替换掉结果
-                    retval.replace(jstring);
-                    console.log("getSum方法返回值为:roysue")
-                }
-        });
-    })}
-    setImmediate(frida_Java,0);
-    ```
 
