@@ -6,20 +6,18 @@
    
    ```js
     // ByteString.of是用来把byte[]数组转成hex字符串的函数, Android系统自带ByteString类
-   function hookSign() {
-       Java.perform(function () {
-           var NativeApi = Java.use('com.weibo.xvideo.NativeApi');
-           // 使用系统工具类将byte数组转成hex、utf8.
-           var ByteString = Java.use("com.android.okhttp.okio.ByteString");
-           NativeApi.s.implementation = function (str1, str2) {
-               var result = this.s(str1, str2);
-               console.log("str:" + ByteString.of(str1).utf8())
-               console.log("hex:" + ByteString.of(str1).hex())
-               console.log(result);
-               return result;
-           }
-       });
-   } 
+    var ByteString = Java.use("com.android.okhttp.okio.ByteString");
+    var j = Java.use("c.business.comm.j");
+    j.x.implementation = function() {
+        var result = this.x();
+        console.log("j.x:", ByteString.of(result).hex());
+        return result;
+    };
+    
+    j.a.overload('[B').implementation = function(bArr) {
+        this.a(bArr);
+        console.log("j.a:", ByteString.of(bArr).hex());
+    };   
    ```
    
 2. [构造一个字符串](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L23)
@@ -108,13 +106,34 @@
    ```
    ![](pic/01.d.png)  
 
-9. hook all interface
-   ```
+9. hook 打印类实现的接口
+   ```java
+   /*
    public class milk implements liquid {
    implements //就是接口的意思。关键字，implements是一个类，实现一个接口用的关键字，它是用来实现接口中定义的抽象方法。实现一个接口，必须实现接口中的所有方法。
+   */
+   function searchInterface(){
+       Java.perform(function(){
+           Java.enumerateLoadedClasses({
+               onComplete: function(){},
+               onMatch: function(name,handle){
+                   if (name.indexOf("com.r0ysue.a0526printout") > -1) { // 使用包名进行过滤
+                       console.log("find class");
+                       var targetClass = Java.use(name);
+                       var interfaceList = targetClass.class.getInterfaces(); // 使用反射获取类实现的接口数组
+                       if (interfaceList.length > 0) {
+                           console.log(name) // 打印类名
+                           for (var i in interfaceList) {
+                               console.log("\t", interfaceList[i].toString()); // 直接打印接口名称
+                           }
+                       }
+                   }
+               }
+           })
+       })
+   }
    ```
-   ![](pic/01.e.png)  
-
+   
 10. 如果一个类想hook，但是类/函数没有import，可以看它的smali文件，找到相应的信息
     ```
     Java.lang.System 就是System的类名。
@@ -165,7 +184,7 @@
 
 14. [gson 解决打印问题，打印char数组、bytes数组等](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/0526.js#L16)
 
-     ```
+     ```java
      在使用gson.dex打印[object]的时候，有时候apk里内置了一个gson，再load就会有重名的问题。
      我自己编译了一个gson，改了包名，效果如图，这样就不会再重名了。
      使用方法：解压，adb push到fridaserver同目录下之后
@@ -220,6 +239,38 @@
 
 20. [non-ascii类名方法名hook](https://api-caller.com/2019/03/30/frida-note/)
 
+    ```java
+    int ֏(int x) {
+            return x + 100;
+        }
+    ```
+
+    针对上面的`֏`, 直接用`js`编码, 在通过`类名[js解码的方法名]`进行`implementation`
+
+    ```java
+    Java.perform(
+            function x() {
+    
+                var targetClass = "com.example.hooktest.MainActivity";
+    
+                var hookCls = Java.use(targetClass);
+                var methods = hookCls.class.getDeclaredMethods();
+    
+                for (var i in methods) {
+                    console.log(methods[i].toString());
+                    console.log(encodeURIComponent(methods[i].toString().replace(/^.*?\.([^\s\.\(\)]+)\(.*?$/, "$1")));
+                }
+    
+                hookCls[decodeURIComponent("%D6%8F")]
+                    .implementation = function (x) {
+                        console.log("original call: fun(" + x + ")");
+                        var result = this[decodeURIComponent("%D6%8F")](900);
+                        return result;
+                    }
+            }
+        )
+    ```
+
 21. [rpc 上传到PC上打印，内外互联](https://www.freebuf.com/articles/system/190565.html)
 
 22. [Java.use得到的类使用java的内置方法](https://github.com/heyhu/frida-agent-example/blob/master/code/rouse/hook_java/challenge_hook.js#L67)
@@ -236,4 +287,83 @@
      很多对象都可以用 .toString() 来打印字符串
      ```
 
+24. Hook 获取 context
 
+    ```java
+    function getContext(){
+        Java.perform(function(){
+            var currentApplication = Java.use("android.app.ActivityThread").currentApplication();
+            console.log(currentApplication);
+            var context = currentApplication.getApplicationContext();
+            console.log(context);
+            var packageName = context.getPackageName();
+            console.log(packageName);
+            console.log(currentApplication.getPackageName());
+        })
+    }
+    ```
+
+25. 主动调用构造方法
+
+    ```java
+    function main(){
+        Java.perform(function(){
+            var StringClass = Java.use("java.lang.String");
+        		var MoneyClass = Java.use("com.xiaojianbang.app.Money");
+            MoneyClass.$init.overload('java.lang.String','int').implementation = function(x,y){
+                console.log('hook Money init');
+                var myX = StringClass.new("Hello World!");
+                var myY = 9999;
+                this.$init(myX,myY);
+            }
+        })
+    }
+    setImmediate(main);
+    ```
+
+26. 主动调用静态方法
+
+    ```java
+    function main_rsa(){
+        Java.perform(function(){
+            var RSA = Java.use("com.xiaojianbang.app.RSA");
+            var StringClass = Java.use("java.lang.String");
+            var base64Class = Java.use("android.util.Base64");
+            var myBytes = StringClass.$new("Hello World").getBytes();
+            var result = RSA.encrypt(myBytes);
+            console.log("result is :", result);
+            console.log("json result is: ",JSON.stringify(result));
+            console.log("base64 result is :", base64Class.encodeToString(result,0));
+            // console.log("new String is : ", StringClass.$new(result)); // 加密之后的内容有很多不可见字符, 不能直接 new String()
+    
+        })
+    }
+    
+    setImmediate(main_rsa);
+    ```
+
+27. 主动调用动态方法
+
+    ```java
+    // 非静态方法的主动调用 自定义instance 并调用 非静态方法
+    function main_getInfo(){
+        Java.perform(function(){
+            var instance = Java.use("com.xiaojianbang.app.Money").$new("日元",300000);
+            console.log(instance.getInfo());
+        })
+    }
+    
+    // 遍历所有的对象并调用 需要进行过滤
+    function main_instance_getInfo(){
+        Java.perform(function(){
+            Java.choose("com.xiaojianbang.app.Money",{
+                onComplete: function(){},
+                onMatch: function(instance){
+                    console.log(instance.getInfo());
+                }
+            })
+        })
+    }
+    ```
+
+    
