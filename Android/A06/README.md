@@ -261,7 +261,7 @@ T函数步骤：
    w0 = 2b7e1516，w3 = 0x09cf4f3c，T(w3) = sbox(shiftrow(w3)) ^ rcon[i]
    循环左移1位 -> cf4f3c09
    S表替换  -> 8a84eb01
-   con表异或 -> 8b84eb01(rcon表固定的，rcon表=01000000、02000000)
+   rcon表异或 -> 8b84eb01(rcon表固定的，rcon = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36])
    最后 w4 = 8b84eb01 ^ w0 = a0fafe17
 w5的计算：
    w5 = w4 ^ w1 = a0fafe17 ^ w1
