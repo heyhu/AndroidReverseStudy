@@ -248,7 +248,7 @@ w0   w1   w2   w3  w4  w5  w6 .....w43
 **2.1 w4-w17的生成**
 
 ```
-w4 = T(w3) ^ w0 每当Windex index为4的倍数时都需要wi-1走一遍T函数
+w4 = T(w3) ^ w0, Wn = T(Wn-1) xor Wn-4 每当Windex index为4的倍数时都需要wi-1走一遍T函数
 w5、w6、w7时 w5 = w4 ^ w1, wi = wi-1 ^ wi-4（如果i不是4的倍数）
 
 T函数步骤：
