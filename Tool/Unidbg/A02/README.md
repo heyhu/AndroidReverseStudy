@@ -11,6 +11,8 @@
     - [HookZz--InlineHook](#HookZz--InlineHook)
     - [UnicornHook](#UnicornHook)
     - [ConsoleDebugger](#ConsoleDebugger)
+    - [监控内存访问](#监控内存访问)
+    - [查看函数执行流的汇编长度]()
   * [0x03. 主动调用](#0x03-主动调用)
     - [使用原生函数](#使用原生函数)
     - [封装的API](#Unidbg封装的API)
@@ -355,6 +357,109 @@ public void HookMemcmp(){
   });
 }
 ```
+
+> JNIEnv->NewStringUTF  was called from RX@0x4000336f[libmakeurl.so]0x336f
+
+如果提示调用处在0x336f，这个地址实际上是LR（返回地址），所以NewStringUTF函数调用是 0x336f 的上一条 0x336C，对这个地址打断点。
+
+![](pic/06.png)
+
+#### 监控内存访问
+
+使用场景:因为白盒加密的主要实现方式是查表法，所以加密主体就是大量的内存访问。那么记录函数对内存的访问以及发起访问的地址（PC指针），绘制成折线图，就可以较好的反映加密流程。使用Unidbg的ReadHook
+
+```java
+public void traceAESRead(){
+    emulator.getBackend().hook_add_new(new ReadHook() {
+        @Override
+        public void hook(Backend backend, long address, int size, Object user) {
+            long now = emulator.getBackend().reg_read(ArmConst.UC_ARM_REG_PC).intValue();
+            if((now>module.base) & (now < (module.base+module.size))){
+                System.out.println(now - module.base);
+            }
+        }
+
+        @Override
+        public void onAttach(UnHook unHook) {
+
+        }
+
+        @Override
+        public void detach() {
+
+        }
+    }, module.base, module.base+module.size, null);
+}
+```
+
+规则如下：监控整个SO地址范围内的内存读取操作，记录其发起地址，减去了SO基地址，只打印偏移，呈现效果更好。
+
+将这几千条记录拷贝出来，保存在trace.txt 中，在Python中做可视化，这十分方便。需要安装matplotlib以及numpy库。
+
+```python
+import matplotlib.pyplot as plt
+import numpy
+
+input = numpy.loadtxt("trace.txt", int)
+
+plt.plot(range(len(input)), input)
+plt.show()
+```
+
+运行后生成折线图，将其放大是如下效果:
+
+![](pic/04.png)
+
+X轴的计数单位是次数，表示当前是第几次内存访问，如图，在程序的运行过程中，发生了1400余次对SO内存的读操作，Y轴是发起访问的偏移地址。需要注意，X与Y轴的数值表示为十进制。图上可得，Y主要在80000-100000之间，我们修改Y轴范围，增强呈现效果。
+
+```python
+import matplotlib.pyplot as plt
+import numpy
+
+input = numpy.loadtxt("trace.txt", int)
+
+# 限制Y
+plt.ylim(85000, 90000)
+plt.plot(range(len(input)), input)
+plt.show()
+```
+
+运行后:
+
+![](pic/05.png)
+
+首先，可以比较明显的看到，存在十个重复的模式，这代表了十轮运算。这一点是有用的，可用于区分AES-128/192/256，分别对应10/12/14 轮。
+
+除此之外，我们发现每轮运算的起点是一个较低的地址，具体在86000附近左右，转成十六进制就是0x14FF0附近，正是所分析的wbShiftRows中。
+
+#### 查看函数执行流的汇编长度
+
+确认函数执行流的汇编长度，如果上千万甚至上亿行，那我们就徐徐图之，如果几十万行，那就重拳出击。
+
+```java
+public void traceLength(){
+    emulator.getBackend().hook_add_new(new CodeHook() {
+        int count = 0;
+        @Override
+        public void hook(Backend backend, long address, int size, Object user) {
+            count += 1;
+            System.out.println(count);
+        }
+
+        @Override
+        public void onAttach(UnHook unHook) {
+
+        }
+
+        @Override
+        public void detach() {
+
+        }
+    }, module.base, module.size+module.base, null);
+}
+```
+
+不超过100w行的执行流，要么程序没怎么混淆，要么逻辑不太复杂。两者任意一个复杂度高一些，都不会只有100w行汇编以内。
 
 ### 0x03. 主动调用
 
