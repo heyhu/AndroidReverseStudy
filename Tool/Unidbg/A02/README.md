@@ -24,6 +24,12 @@
   * [0x06. 打开系统调用日志](#0x06-打开系统调用日志)
   * [0x07. 使用Unidbg打印函数参数5之后的值](#0x07-使用Unidbg打印函数参数5之后的值)
   * [0x08. 使用Unidbg打印jobject](#0x08-使用Unidbg打印jobject)
+  * [0x09. 固定随机数与时间戳](#0x09-固定随机数与时间戳)
+    - [lrand48](#lrand48)
+    - [gettimeofday](#gettimeofday)
+  * [0x0a. 数据格式转换](#0x0a-数据格式转换)
+    - [bytesToHex](#bytesToHex)
+    - [hexStringToBytes](#hexStringToBytes)
 
 <!-- /code_chunk_output -->
 
@@ -825,4 +831,121 @@ public void preCall(Emulator<?> emulator, HookZzArm32RegisterContext ctx, HookEn
     System.out.println(new String(result));
 };
 
+```
+
+### 0x09. 固定随机数与时间戳
+
+#### lrand48
+
+```java
+HookZz hookZz = HookZz.getInstance(emulator);
+Symbol lrand48 = module.findSymbolByName("lrand48");
+hookZz.replace(lrand48, new ReplaceCallback() {
+  @Override
+  public void postCall(Emulator<?> emulator, HookContext context) {
+    EditableArm32RegisterContext ctx = emulator.getContext();
+    ctx.setR0(7);
+  }
+}, true);
+```
+
+```java
+public void hookRandom(){
+    emulator.attach().addBreakPoint(module.findSymbolByName("lrand48", true).getAddress(), new BreakPointCallback() {
+        @Override
+        public boolean onHit(Emulator<?> emulator, long address) {
+            System.out.println("call lrand48");
+            emulator.getUnwinder().unwind();
+            emulator.attach().addBreakPoint(emulator.getContext().getLRPointer().peer, new BreakPointCallback() {
+                @Override
+                public boolean onHit(Emulator<?> emulator, long address) {
+                    emulator.getBackend().reg_write(ArmConst.UC_ARM_REG_R0, 0x12345678);
+                    return true;
+                }
+            });
+            return true;
+        }
+    });
+}
+```
+
+#### gettimeofday
+
+```java
+Symbol gettimeofday = module.findSymbolByName("gettimeofday");
+hookZz.replace(gettimeofday, new ReplaceCallback() {
+  UnidbgPointer tv_ptr = null;
+  @Override
+  public HookStatus onCall(Emulator<?> emulator, HookContext context, long originFunction) {
+    tv_ptr = context.getPointerArg(0);
+    return super.onCall(emulator, context, originFunction);
+  }
+  @Override
+  public void postCall(Emulator<?> emulator, HookContext context) {
+    EditableArm32RegisterContext ctx = emulator.getContext();
+    if(tv_ptr != null){
+      ByteBuffer tv = ByteBuffer.allocate(8);
+      tv.order(ByteOrder.LITTLE_ENDIAN);
+      tv.putInt(0,1626403551);
+      tv.putInt(4, 151606);
+      byte[] data = tv.array();
+      tv_ptr.write(0,data,0,8);
+    }
+  }
+}, true);
+```
+
+### 0x0a. 数据格式转换
+
+#### bytesToHex
+
+```java
+private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+
+public static String bytesToHex(byte[] bytes) {
+  char[] hexChars = new char[bytes.length * 2];
+  for (int j = 0; j < bytes.length; j++) {
+    int v = bytes[j] & 0xFF;
+    hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+    hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+  }
+  return new String(hexChars);
+}
+```
+
+```java
+public static String bytesTohexString(byte[] bytes) {
+  StringBuffer sb = new StringBuffer();
+  for(int i = 0; i < bytes.length; i++) {
+    String hex = Integer.toHexString(bytes[i] & 0xFF);
+    if(hex.length() < 2){
+      sb.append(0);
+    }
+    sb.append(hex);
+  }
+  return sb.toString();
+}
+```
+
+#### hexStringToBytes
+
+```java
+public static byte[] hexStringToBytes(String hexString) {
+  if (hexString.isEmpty()) {
+    return null;
+  }
+  hexString = hexString.toLowerCase();
+  final byte[] byteArray = new byte[hexString.length() >> 1];
+  int index = 0;
+  for (int i = 0; i < hexString.length(); i++) {
+    if (index  > hexString.length() - 1) {
+      return byteArray;
+    }
+    byte highDit = (byte) (Character.digit(hexString.charAt(index), 16) & 0xFF);
+    byte lowDit = (byte) (Character.digit(hexString.charAt(index + 1), 16) & 0xFF);
+    byteArray[i] = (byte) (highDit << 4 | lowDit);
+    index += 2;
+  }
+  return byteArray;
+}
 ```
