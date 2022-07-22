@@ -10,9 +10,11 @@
     - [HookZz--寄存器](#HookZz--寄存器)
     - [HookZz--InlineHook](#HookZz--InlineHook)
     - [UnicornHook](#UnicornHook)
+    - [Xhook](#xhook)
     - [ConsoleDebugger](#ConsoleDebugger)
     - [监控内存访问](#监控内存访问)
     - [查看函数执行流的汇编长度](#查看函数执行流的汇编长度)
+    - [searchData](#searchData)
   * [0x03. 主动调用](#0x03-主动调用)
     - [使用原生函数](#使用原生函数)
     - [封装的API](#Unidbg封装的API)
@@ -20,6 +22,7 @@
     - [打印寄存器的值](#打印寄存器的值)
     - [traceRead](#traceRead)
     - [traceWrite](#traceWrite)
+    - [traceFunctionCall](#traceFunctionCall)
   * [0x05. Unidbg使用反射补Java的类](#0x05-Unidbg使用反射补Java的类)
   * [0x06. 打开系统调用日志](#0x06-打开系统调用日志)
   * [0x07. 使用Unidbg打印函数参数5之后的值](#0x07-使用Unidbg打印函数参数5之后的值)
@@ -281,6 +284,25 @@ public void hook65540(){
     }
 ```
 
+#### xhook
+
+```java
+public void recordPopenByxHook(){
+  IxHook xHook = XHookImpl.getInstance(emulator);
+  xHook.register("libszstone.so", "popen", new ReplaceCallback() {
+    @Override
+    public HookStatus onCall(Emulator<?> emulator, HookContext context, long originFunction) {
+      RegisterContext registerContext = emulator.getContext();
+      String command = registerContext.getPointerArg(0).getString(0);
+      emulator.set("command", command);
+      return HookStatus.RET(emulator, originFunction);
+    }
+  }, true);
+  // 使其生效
+  xHook.refresh();
+}
+```
+
 #### UnicornHook
 
 - 原生的办法进行Hook，代码量不小，但很多时候，我们会选择它，因为HookZz等工具有时 候会遇到BUG，而且使用HookZz等hook框架时，样本可以较容易的检测到自身代码片段被Hook，而 Unicorn原生的Hook不容易被检测，相当于是CPU自身在打印寄存器。
@@ -466,6 +488,62 @@ public void traceLength(){
 ```
 
 不超过100w行的执行流，要么程序没怎么混淆，要么逻辑不太复杂。两者任意一个复杂度高一些，都不会只有100w行汇编以内。
+
+#### searchData
+
+在SO加载前，因为模块监听器得在SO加载前才能拦截到。
+
+```java
+memory.addModuleListener(new SearchData(data, soName, intervals));
+```
+
+SearchData 构造函数的参数1是待搜索数据的16进制字符串形式，会自动省略空格。
+
+目标数据是e70b75d06455d041df9bb125eaa2cf17，[cyberchef](https://gchq.github.io/CyberChef/#recipe=To_Hex('Space',0)&input=ZTcwYjc1ZDA2NDU1ZDA0MWRmOWJiMTI1ZWFhMmNmMTc) 中转化为十六进制形式，下面两种代码等价。
+
+```java
+memory.addModuleListener(new SearchData("65 37 30 62 37 35 64 30 36 34 35 35 64 30 34 31 64 66 39 62 62 31 32 35 65 61 61 32 63 66 31 37", "libnet_crypto.so", 100));
+```
+
+或
+
+```java
+memory.addModuleListener(newSearchData("6537306237356430363435356430343164663962623132356561613263663137", "libnet_crypto.so", 100));
+```
+
+结果可能已经做了tohex，所以直接把结果当十六进制来搜索
+
+```java
+memory.addModuleListener(new SearchData("e70b75d06455d041df9bb125eaa2cf17", "libnet_crypto.so", 100));
+```
+
+如果搜索不到，再试上面的。
+
+参数2是SO完整的名字，参数3是搜索间隔，比如目前间隔是100个基本块单位。
+
+![](pic/07.png)
+
+断了下来，而且看到“find target xxx”字眼，这说明检索到了数据，我们对tohex的猜想没有错。因为我们按照100个基本块的间隔做搜索，因此当前位置离真实的数据产生位置，可能还有不少偏差。
+
+下面使用SearchData的另一个构造函数，多一个参数，它代表着搜索的起点，搜索间隔也被我调整成了1，即逐基本块搜索。
+
+```java
+memory.addModuleListener(new SearchData("e70b75d06455d041df9bb125eaa2cf17", "libnet_crypto.so", 1,0x2466c));
+```
+
+直接搜索到![](pic/08.png)
+
+IDA跳转到0x63615，正是之前来回跳转才找到的最终地址。
+
+图示两次检索的效果，第一次检索![](pic/09.png)
+
+比较粗糙，发现数据后，工具会打印减去一个间隔后所处于的基本块数，即 **find target at xxx blocks**
+
+第二次检索，以一种更细的粒度做检索
+
+![](pic/10.png)
+
+我们这个样本的汇编量比较小，对于大一些的样本，比如几千万行汇编，第一次检索间隔为1000-10000个基本块比较好，第二次检索间隔为50-500即可，可以再配合内存数据搜索。
 
 ### 0x03. 主动调用
 
@@ -742,6 +820,94 @@ trace的结果：
 ### Memory WRITE at 0xbffff5fc, data size = 1, data value = 0x44 pc=RX@0x40003cba[libnative-lib.so]0x3cba lr=RX@0x40003cb1[libnative-lib.so]0x3cb1
 ### Memory WRITE at 0xbffff5fe, data size = 1, data value = 0x38 pc=RX@0x40003d4e[libnative-lib.so]0x3d4e lr=RX@0x40003d3f[libnative-lib.so]0x3d3f
 ### Memory WRITE at 0xbffff5fd, data size = 1, data value = 0x33 pc=RX@0x40003d56[libnative-lib.so]0x3d56 lr=RX@0x40003d3f[libnative-lib.so]0x3d3f
+```
+
+PC即发生写入操作的第一现场，LR即目标函数的返回地址。可以看到，对数据的写入发生在 libc 标准库中，这一般意味着使用了memcpy 等库函数对内存块做了拷贝操作，我们可以验证一下，在IDA中看LR地址，其上一条指令就是具体发生的调用。
+
+```java
+qmemcpy(v8, a2, v5);
+v10 = -1302498787;// LR
+v6 = &v8[v5];
+```
+
+具体调用就是qmemcpy 函数，不用管前缀，它就是memcpy。
+
+```
+4AA76                 BLX             __aeabi_memcpy
+```
+
+#### traceFunctionCall
+
+基本的函数追踪代码
+
+```java
+debugger.traceFunctionCall(module, new FunctionCallListener() {
+    @Override
+    public void onCall(Emulator<?> emulator, long callerAddress, long functionAddress) {}
+    @Override
+    public void postCall(Emulator<?> emulator, long callerAddress, long functionAddress, Number[] args) {
+        System.out.println("onCallFinish caller=" + UnidbgPointer.pointer(emulator, callerAddress) + ", function=" + UnidbgPointer.pointer(emulator, functionAddress));
+    }
+});
+```
+
+```java
+// aes起始处
+emulator.attach().addBreakPoint(module.base + 0x142c8, new BreakPointCallback() {
+    UnidbgPointer buffer;
+    int length;
+    @Override
+    public boolean onHit(Emulator<?> emulator, long address) {
+        // 使用register获取r1寄存器的内存地址
+        UnidbgPointer plainTextPtr = UnidbgPointer.register(emulator, ArmConst.UC_ARM_REG_R1);
+        //把hex转为bytes数组
+        byte[] p = hexStringToByteArray("30313233343536373839616263646501");
+        for(int i=0;i<p.length;i++){
+            // 写入到r1寄存器的地址
+            plainTextPtr.setByte(i, p[i]);
+        }
+      
+        //获取SP寄存器初始内存块，也就是参数5
+        UnidbgPointer spPtr = UnidbgPointer.register(emulator, ArmConst.UC_ARM_REG_SP);
+        // 设置值
+        spPtr.setInt(0, 0x10);
+        
+        // 查看操作是否生效
+        RegisterContext registerContext = emulator.getContext();
+        UnidbgPointer plainText = registerContext.getPointerArg(1);
+        buffer = registerContext.getPointerArg(3);
+        length = registerContext.getIntArg(4);
+				
+      	//打印plainText
+        Inspector.inspect(plainText.getByteArray(0, length), "input");
+				
+      	// 开启函数追踪, 函数里执行 caller:调用函数的地址，function:调用的是什么函数
+        emulator.attach().traceFunctionCall(module, new FunctionCallListener() {
+            @Override
+            public void onCall(Emulator<?> emulator, long callerAddress, long functionAddress) {
+            }
+            @Override
+            public void postCall(Emulator<?> emulator, long callerAddress, long functionAddress, Number[] args) {
+                System.out.println("onCallFinish caller=" + UnidbgPointer.pointer(emulator, callerAddress) + ", function=" + UnidbgPointer.pointer(emulator, functionAddress));
+            }
+        });
+				// 在0x142c8函数结束返回处断下
+        emulator.attach().addBreakPoint(registerContext.getLRPointer().peer, new BreakPointCallback() {
+            @Override
+            public boolean onHit(Emulator<?> emulator, long address) {
+                // 打印buffer的值
+                Inspector.inspect(buffer.getByteArray(0, length), "output");
+                return false;
+            }
+        });
+      
+        // hook xorwithiv
+        emulator.attach().addBreakPoint(module.base+0x13bc0);
+        // hook First addroundkey
+        emulator.attach().addBreakPoint(module.base+0x1187c);
+        return false;
+    }
+});
 ```
 
 ### 0x05. Unidbg使用反射补Java的类
