@@ -153,7 +153,7 @@ a1 a5 a9  a13
 a2 a6 a10 a14
 a3 a7 a11 a15
 循环左移后:
-a0  a3   a7  a11
+a0  a4 a8  a12
 a5  a9   a13 a1
 a10 a14  a2  a6
 a15 a3   a7 a11
